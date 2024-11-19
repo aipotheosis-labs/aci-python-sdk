@@ -1,13 +1,48 @@
 [tool.poetry]
 name = "aipolabs"
-version = "0.1.0"
-description = ""
-authors = ["Your Name <you@example.com>"]
+version = "0.0.1-beta.1"
+description = "The official Python SDK for the Aipolabs (Aipotheosis Labs) API"
+authors = ["Aipolabs <team@aipolabs.xyz>"]
 readme = "README.md"
+homepage = "https://aipolabs.xyz"
+repository = "https://github.com/aipolabs/aipolabs-python"
+packages = [
+    { include = "aipolabs", from = "." }
+]
+classifiers = [
+    "Typing :: Typed",
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+    "Operating System :: POSIX",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = ">=3.8"
+pydantic = "^2.9.2"
+typing-extensions = "^4.12.0"
+httpx = "^0.27.2"
+cached-property = { version = "^2.0.1", python = "<3.8" }
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+mypy = "^1.11.2"
+flake8 = "^7.1.1"
+black = "^24.8.0"
+isort = "^5.13.2"
+pre-commit = "^4.0.0"
+
+[tool.black]
+line-length = 100
 
 [build-system]
 requires = ["poetry-core"]
