@@ -13,7 +13,6 @@ classifiers = [
     "Typing :: Typed",
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
@@ -27,11 +26,10 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8"
+python = "^3.10"
 pydantic = "^2.9.2"
 typing-extensions = "^4.12.0"
 httpx = "^0.27.2"
-cached-property = { version = "^2.0.1", python = "<3.8" }
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
