@@ -1,9 +1,11 @@
 from pydantic import BaseModel
 
+AIPOLABS_FETCH_FUNCTION_DEFINITION_NAME = "AIPOLABS_FETCH_FUNCTION_DEFINITION"
+
 AIPOLABS_FETCH_FUNCTION_DEFINITION = {
     "type": "function",
     "function": {
-        "name": "AIPOLABS_FETCH_FUNCTION_DEFINITION",
+        "name": AIPOLABS_FETCH_FUNCTION_DEFINITION_NAME,
         "strict": True,
         "description": "This function allows you to fetch the definition of an executable function.",
         "parameters": {
