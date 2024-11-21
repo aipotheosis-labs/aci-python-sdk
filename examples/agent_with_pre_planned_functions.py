@@ -33,23 +33,23 @@ def main() -> None:
             },
         ],
         tools=[brave_search_function_definition],
+        tool_choice="required",  # force the model to generate a tool call for demo purposes
     )
-    content = response.choices[0].message.content
     tool_call = (
         response.choices[0].message.tool_calls[0]
         if response.choices[0].message.tool_calls
         else None
     )
-    if content:
-        print(create_headline("Response content"))
-        print(content)
+
     if tool_call:
         print(create_headline("Tool call"))
         print(
             f"Function name: {tool_call.function.name}, arguments: {tool_call.function.arguments}"
         )
+        # submit the selected function and its arguments to aipolabs backend for execution
         result = aipolabs.execute_function(tool_call.function.name, tool_call.function.arguments)
         print(create_headline("Function execution result"))
+        # result["success"] indicates whether the function execution (not the request itself) was successful
         if result["success"]:
             print(result["data"])
         else:
