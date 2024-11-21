@@ -1,3 +1,5 @@
+from pydantic import BaseModel
+
 AIPOLABS_SEARCH_FUNCTIONS = {
     "type": "function",
     "function": {
@@ -14,7 +16,7 @@ AIPOLABS_SEARCH_FUNCTIONS = {
                     "description": "The names of the apps you want to search functions for If provided, the search will be limited to the functions of the specified apps. Use null to search functions across all apps. You can find app names by first using the AIPOLABS_SEARCH_APPS function.",
                 },
                 "intent": {
-                    "type": "string",
+                    "type": ["string", "null"],
                     "description": "Use this to find relevant functions you might need. Returned results of this function will be sorted by relevance to the intent. Examples include 'what's the top news in the stock market today', 'i want to automate outbound marketing emails'.",
                 },
                 "limit": {
@@ -36,3 +38,10 @@ AIPOLABS_SEARCH_FUNCTIONS = {
         },
     },
 }
+
+
+class SearchFunctionsParameters(BaseModel):
+    app_names: list[str] | None = None
+    intent: str | None = None
+    limit: int | None = None
+    offset: int | None = None

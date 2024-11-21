@@ -1,3 +1,5 @@
+from pydantic import BaseModel
+
 AIPOLABS_FETCH_FUNCTION_DEFINITION = {
     "type": "function",
     "function": {
@@ -17,3 +19,7 @@ AIPOLABS_FETCH_FUNCTION_DEFINITION = {
         },
     },
 }
+
+
+class FetchFunctionDefinitionParameters(BaseModel):
+    function_name: str
