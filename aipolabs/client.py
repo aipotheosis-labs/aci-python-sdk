@@ -7,7 +7,16 @@ from typing import Any
 
 import httpx
 
-from aipolabs.exceptions import APIKeyNotFound
+from aipolabs.exceptions import (
+    AipolabsError,
+    APIKeyNotFound,
+    AuthenticationError,
+    NotFoundError,
+    PermissionError,
+    RateLimitError,
+    ServerError,
+    ValidationError,
+)
 from aipolabs.tools.fetch_function_definition import (
     AIPOLABS_FETCH_FUNCTION_DEFINITION_NAME,
     FetchFunctionDefinitionParameters,
@@ -25,7 +34,9 @@ logger.addFilter(SensitiveHeadersFilter())
 
 class Aipolabs:
 
-    def __init__(self, *, api_key: str | None, base_url: str | httpx.URL | None) -> None:
+    def __init__(
+        self, *, api_key: str | None = None, base_url: str | httpx.URL | None = None
+    ) -> None:
         """Create and initialize a new Aipolabs client.
 
         Args:
@@ -74,9 +85,11 @@ class Aipolabs:
                     function_parameters_json, strict=True
                 )
             )
-            return self.fetch_function_definition(fetch_function_definition_parameters)
+            return self.fetch_function_definition(
+                fetch_function_definition_parameters.function_name
+            )
         else:
-            # todo: check function exist
+            # TODO: check function exist
             return self.execute_function(function_name, function_parameters_json)
 
     def search_apps(self, params: SearchAppsParameters) -> Any:
@@ -87,8 +100,7 @@ class Aipolabs:
             params=params.model_dump(exclude_unset=True),
         )
 
-        logger.info(f"Search apps response: {response.json()}")
-        return response.json()
+        return self._handle_response(response)
 
     def search_functions(self, params: SearchFunctionsParameters) -> Any:
         logger.info(f"Searching functions with params: {params.model_dump(exclude_unset=True)}")
@@ -96,19 +108,17 @@ class Aipolabs:
             "functions/search",
             params=params.model_dump(exclude_unset=True),
         )
-        logger.info(f"Search functions response: {response.json()}")
-        return response.json()
 
-    def fetch_function_definition(self, params: FetchFunctionDefinitionParameters) -> Any:
-        logger.info(
-            f"Fetching function definition with params: {params.model_dump(exclude_unset=True)}"
-        )
+        return self._handle_response(response)
+
+    def fetch_function_definition(self, function_name: str) -> Any:
+        logger.info(f"Fetching function definition of {function_name}")
         response = self.client.get(
-            f"functions/{params.function_name}",
+            f"functions/{function_name}",
             params={"inference_provider": self.inference_provider},
         )
-        logger.info(f"Fetch function definition response: {response.json()}")
-        return response.json()
+
+        return self._handle_response(response)
 
     def execute_function(self, function_name: str, function_parameters_json: str) -> Any:
         logger.info(
@@ -121,10 +131,47 @@ class Aipolabs:
             f"functions/{function_name}",
             json=request_body,
         )
-        logger.info(f"Execute function response: {response.json()}")
-        return response.json()
+
+        return self._handle_response(response)
 
     def _enforce_trailing_slash(self, url: httpx.URL) -> httpx.URL:
         if url.raw_path.endswith(b"/"):
             return url
         return url.copy_with(raw_path=url.raw_path + b"/")
+
+    def _handle_response(self, response: httpx.Response) -> Any:
+        """Handle the API response and raise appropriate exceptions if needed."""
+        try:
+            response_json = response.json() if response.content else None
+        except json.JSONDecodeError:
+            response_json = None
+
+        error_message: str
+        if isinstance(response_json, dict):
+            error_message = str(
+                response_json.get("message") or response_json.get("error") or response.text
+            )
+        else:
+            error_message = response.text
+
+        if response.status_code == 200:
+            return response_json
+
+        if response.status_code == 401:
+            raise AuthenticationError(error_message, response.status_code, response.text)
+        elif response.status_code == 403:
+            raise PermissionError(error_message, response.status_code, response.text)
+        elif response.status_code == 404:
+            raise NotFoundError(error_message, response.status_code, response.text)
+        elif response.status_code == 400:
+            raise ValidationError(error_message, response.status_code, response.text)
+        elif response.status_code == 429:
+            raise RateLimitError(error_message, response.status_code, response.text)
+        elif 500 <= response.status_code < 600:
+            raise ServerError(error_message, response.status_code, response.text)
+        else:
+            raise AipolabsError(
+                f"Unexpected error occurred. Status code: {response.status_code}",
+                response.status_code,
+                response.text,
+            )
