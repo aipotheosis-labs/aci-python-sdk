@@ -1,5 +1,3 @@
-import os
-
 from dotenv import load_dotenv
 from openai import OpenAI
 
@@ -8,8 +6,6 @@ from aipolabs.utils.logging import create_headline
 
 load_dotenv()
 
-print(os.environ.get("OPENAI_API_KEY"))
-print(os.environ.get("AIPOLABS_API_KEY"))
 # gets OPENAI_API_KEY from your environment variables
 openai = OpenAI()
 # gets AIPOLABS_API_KEY from your environment variables
@@ -21,11 +17,7 @@ def main() -> None:
         Function.BRAVE_SEARCH__WEB_SEARCH
     )
 
-    print(
-        create_headline(
-            f"Brave search function definition, type: {type(brave_search_function_definition)}"
-        )
-    )
+    print(create_headline("Brave search function definition"))
     print(brave_search_function_definition)
 
     response = openai.chat.completions.create(
@@ -53,8 +45,15 @@ def main() -> None:
         print(content)
     if tool_call:
         print(create_headline("Tool call"))
-        print(tool_call.function.name)
-        print(tool_call.function.arguments)
+        print(
+            f"Function name: {tool_call.function.name}, arguments: {tool_call.function.arguments}"
+        )
+        result = aipolabs.execute_function(tool_call.function.name, tool_call.function.arguments)
+        print(create_headline("Function execution result"))
+        if result["success"]:
+            print(result["data"])
+        else:
+            print(result["error"])
 
 
 if __name__ == "__main__":
