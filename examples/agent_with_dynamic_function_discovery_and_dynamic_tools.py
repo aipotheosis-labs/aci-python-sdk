@@ -58,7 +58,7 @@ def main() -> None:
             ]
             + chat_history,
             tools=tools_meta + tools_fetched,
-            # tool_choice="required",  # force the model to generate a tool call for demo purposes
+            # tool_choice="required",  # force the model to generate a tool call
             parallel_tool_calls=False,
         )
 
