@@ -11,7 +11,7 @@ httpx_logger: logging.Logger = logging.getLogger("httpx")
 
 
 SENSITIVE_HEADERS = {"x-api-key", "authorization"}
-AIPOLABS_LOG_LEVEL = os.environ.get("AIPOLABS_LOG_LEVEL", "info")
+AIPOLABS_LOG_LEVEL = os.environ.get("AIPOLABS_LOG_LEVEL", "warn")
 
 
 def setup_logging() -> None:
@@ -19,12 +19,14 @@ def setup_logging() -> None:
         format="[%(asctime)s - %(name)s:%(lineno)d - %(levelname)s] %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
+    httpx_logger.setLevel(logging.WARN)
+
     if AIPOLABS_LOG_LEVEL == "debug":
         logger.setLevel(logging.DEBUG)
-        httpx_logger.setLevel(logging.DEBUG)
     elif AIPOLABS_LOG_LEVEL == "info":
         logger.setLevel(logging.INFO)
-        httpx_logger.setLevel(logging.INFO)
+    else:
+        logger.setLevel(logging.WARN)
 
 
 class SensitiveHeadersFilter(logging.Filter):

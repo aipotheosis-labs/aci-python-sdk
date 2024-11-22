@@ -42,10 +42,8 @@ def main() -> None:
     )
 
     if tool_call:
-        print(create_headline("Tool call"))
-        print(
-            f"Function name: {tool_call.function.name}, arguments: {tool_call.function.arguments}"
-        )
+        print(create_headline(f"Tool call: {tool_call.function.name}"))
+        print(f"arguments: {tool_call.function.arguments}")
         # submit the selected function and its arguments to aipolabs backend for execution
         result = aipolabs.execute_function(tool_call.function.name, tool_call.function.arguments)
         print(create_headline("Function execution result"))

@@ -6,7 +6,6 @@ AIPOLABS_FETCH_FUNCTION_DEFINITION = {
     "type": "function",
     "function": {
         "name": AIPOLABS_FETCH_FUNCTION_DEFINITION_NAME,
-        "strict": True,
         "description": "This function allows you to fetch the definition of an executable function.",
         "parameters": {
             "type": "object",

@@ -7,6 +7,7 @@ from typing import Any
 
 import httpx
 
+from aipolabs.enums.function_call_type import AipolabsFunctionCallType
 from aipolabs.exceptions import (
     AipolabsError,
     APIKeyNotFound,
@@ -67,7 +68,7 @@ class Aipolabs:
 
     def handle_function_call(
         self, function_name: str, function_parameters_json: str
-    ) -> tuple[bool, Any]:
+    ) -> tuple[AipolabsFunctionCallType, Any]:
         """Handle a function call.
 
         Args:
@@ -75,9 +76,7 @@ class Aipolabs:
             function_parameters_json: The parameters of the function to call.
 
         Returns:
-            A tuple with a boolean indicating whether the function call was a meta function call: AIPOLABS_SEARCH_APPS_NAME, AIPOLABS_SEARCH_FUNCTIONS_NAME, AIPOLABS_FETCH_FUNCTION_DEFINITION_NAME
-            - True: the function call was a meta function call and the result is the result of the meta function call.
-            - False: the function call was a function execution and the result is the result of the function execution.
+            A tuple with the type of the function call and the result of the function call.
         """
         logger.info(
             f"Handling function call with name: {function_name} and params: {function_parameters_json}"
@@ -86,24 +85,28 @@ class Aipolabs:
             search_apps_parameters = SearchAppsParameters.model_validate_json(
                 function_parameters_json, strict=True
             )
-            return True, self.search_apps(search_apps_parameters)
+            return AipolabsFunctionCallType.SEARCH, self.search_apps(search_apps_parameters)
         elif function_name == AIPOLABS_SEARCH_FUNCTIONS_NAME:
             search_functions_parameters = SearchFunctionsParameters.model_validate_json(
                 function_parameters_json, strict=True
             )
-            return True, self.search_functions(search_functions_parameters)
+            return AipolabsFunctionCallType.SEARCH, self.search_functions(
+                search_functions_parameters
+            )
         elif function_name == AIPOLABS_FETCH_FUNCTION_DEFINITION_NAME:
             fetch_function_definition_parameters = (
                 FetchFunctionDefinitionParameters.model_validate_json(
                     function_parameters_json, strict=True
                 )
             )
-            return True, self.fetch_function_definition(
+            return AipolabsFunctionCallType.FETCH, self.fetch_function_definition(
                 fetch_function_definition_parameters.function_name
             )
         else:
-            # TODO: check function exist
-            return False, self.execute_function(function_name, function_parameters_json)
+            # TODO: check function exist if not return AipolabsFunctionCallType.UNKNOWN
+            return AipolabsFunctionCallType.EXECUTE, self.execute_function(
+                function_name, function_parameters_json
+            )
 
     def search_apps(self, params: SearchAppsParameters) -> Any:
         # TODO: exclude_unset

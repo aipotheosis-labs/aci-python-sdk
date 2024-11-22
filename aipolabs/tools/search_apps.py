@@ -5,7 +5,6 @@ AIPOLABS_SEARCH_APPS = {
     "type": "function",
     "function": {
         "name": AIPOLABS_SEARCH_APPS_NAME,
-        "strict": True,
         "description": "This function allows you to find relevant apps (which includeds a set of functions) that can help complete your tasks or get data and information you need.",
         "parameters": {
             "type": "object",
