@@ -20,7 +20,7 @@ openai = OpenAI()
 aipolabs = Aipolabs()
 
 prompt = (
-    "You are a helpful assistant with access to a variety of tools via three meta functions: "
+    "You are a helpful assistant with access to a unlimited number of tools via three meta functions: "
     "AIPOLABS_SEARCH_APPS, AIPOLABS_SEARCH_FUNCTIONS, and AIPOLABS_FETCH_FUNCTION_DEFINITION."
     "You can use AIPOLABS_SEARCH_APPS to find relevant apps (which include a set of functions), if you find Apps that might help with your tasks you can use AIPOLABS_SEARCH_FUNCTIONS to find relevant functions within certain apps."
     "You can also use AIPOLABS_SEARCH_FUNCTIONS directly to find relevant functions across all apps."
