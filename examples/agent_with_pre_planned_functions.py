@@ -1,3 +1,5 @@
+import json
+
 from dotenv import load_dotenv
 from openai import OpenAI
 
@@ -45,7 +47,9 @@ def main() -> None:
         print(create_headline(f"Tool call: {tool_call.function.name}"))
         print(f"arguments: {tool_call.function.arguments}")
         # submit the selected function and its arguments to aipolabs backend for execution
-        result = aipolabs.execute_function(tool_call.function.name, tool_call.function.arguments)
+        result = aipolabs.execute_function(
+            tool_call.function.name, json.loads(tool_call.function.arguments)
+        )
         print(create_headline("Function execution result"))
         # result["success"] indicates whether the function execution (not the request itself) was successful
         if result["success"]:

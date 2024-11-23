@@ -18,6 +18,10 @@ from aipolabs.exceptions import (
     ServerError,
     ValidationError,
 )
+from aipolabs.tools.execute_function import (
+    AIPOLABS_EXECUTE_FUNCTION_NAME,
+    ExecuteFunctionParameters,
+)
 from aipolabs.tools.fetch_function_definition import (
     AIPOLABS_FETCH_FUNCTION_DEFINITION_NAME,
     FetchFunctionDefinitionParameters,
@@ -67,45 +71,50 @@ class Aipolabs:
         self.client = httpx.Client(base_url=self.base_url, headers=self.headers)
 
     def handle_function_call(
-        self, function_name: str, function_parameters_json: str
+        self, function_name: str, function_parameters: dict
     ) -> tuple[AipolabsFunctionCallType, Any]:
         """Handle a function call.
 
         Args:
             function_name: The name of the function to call.
-            function_parameters_json: The parameters of the function to call.
+            function_parameters: The parameters of the function to call.
 
         Returns:
             A tuple with the type of the function call and the result of the function call.
         """
         logger.info(
-            f"Handling function call with name: {function_name} and params: {function_parameters_json}"
+            f"Handling function call with name: {function_name} and params: {function_parameters}"
         )
         if function_name == AIPOLABS_SEARCH_APPS_NAME:
-            search_apps_parameters = SearchAppsParameters.model_validate_json(
-                function_parameters_json, strict=True
-            )
-            return AipolabsFunctionCallType.SEARCH, self.search_apps(search_apps_parameters)
+            search_apps_parameters = SearchAppsParameters.model_validate(function_parameters)
+            return AipolabsFunctionCallType.META_SEARCH, self.search_apps(search_apps_parameters)
         elif function_name == AIPOLABS_SEARCH_FUNCTIONS_NAME:
-            search_functions_parameters = SearchFunctionsParameters.model_validate_json(
-                function_parameters_json, strict=True
+            search_functions_parameters = SearchFunctionsParameters.model_validate(
+                function_parameters
             )
-            return AipolabsFunctionCallType.SEARCH, self.search_functions(
+            return AipolabsFunctionCallType.META_SEARCH, self.search_functions(
                 search_functions_parameters
             )
         elif function_name == AIPOLABS_FETCH_FUNCTION_DEFINITION_NAME:
-            fetch_function_definition_parameters = (
-                FetchFunctionDefinitionParameters.model_validate_json(
-                    function_parameters_json, strict=True
-                )
+            fetch_function_definition_parameters = FetchFunctionDefinitionParameters.model_validate(
+                function_parameters
             )
-            return AipolabsFunctionCallType.FETCH, self.fetch_function_definition(
+            return AipolabsFunctionCallType.META_FETCH, self.fetch_function_definition(
                 fetch_function_definition_parameters.function_name
+            )
+        elif function_name == AIPOLABS_EXECUTE_FUNCTION_NAME:
+
+            execute_function_parameters = ExecuteFunctionParameters.model_validate(
+                function_parameters
+            )
+            return AipolabsFunctionCallType.META_EXECUTE, self.execute_function(
+                execute_function_parameters.function_name,
+                execute_function_parameters.function_parameters,
             )
         else:
             # TODO: check function exist if not return AipolabsFunctionCallType.UNKNOWN
-            return AipolabsFunctionCallType.EXECUTE, self.execute_function(
-                function_name, function_parameters_json
+            return AipolabsFunctionCallType.DIRECT_EXECUTE, self.execute_function(
+                function_name, function_parameters
             )
 
     def search_apps(self, params: SearchAppsParameters) -> Any:
@@ -136,12 +145,12 @@ class Aipolabs:
 
         return self._handle_response(response)
 
-    def execute_function(self, function_name: str, function_parameters_json: str) -> Any:
+    def execute_function(self, function_name: str, function_parameters: dict) -> Any:
         logger.info(
-            f"Executing function with name: {function_name} and params: {function_parameters_json}"
+            f"Executing function with name: {function_name} and params: {function_parameters}"
         )
         request_body = {
-            "function_input": json.loads(function_parameters_json),
+            "function_input": function_parameters,
         }
         response = self.client.post(
             f"functions/{function_name}/execute",
