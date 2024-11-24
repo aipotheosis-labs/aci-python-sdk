@@ -5,7 +5,7 @@ This is an alternative approach to appending the retrieved function definition t
 
 from pydantic import BaseModel
 
-from aipolabs.meta_functions import AipolabsGetFunctionDefinition
+import aipolabs.meta_functions._aipolabs_get_function_definition as AipolabsGetFunctionDefinition
 
 NAME = "AIPOLABS_EXECUTE_FUNCTION"
 SCHEMA = {

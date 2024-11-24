@@ -6,15 +6,29 @@ import os
 from typing import Any
 
 import httpx
+from tenacity import (
+    after_log,
+    before_log,
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
 
-from aipolabs.exceptions import (
-    AipolabsError,
+from aipolabs._constants import (
+    DEFAULT_MAX_RETRIES,
+    DEFAULT_RETRY_MAX_WAIT,
+    DEFAULT_RETRY_MIN_WAIT,
+    DEFAULT_RETRY_MULTIPLIER,
+)
+from aipolabs._exceptions import (
     APIKeyNotFound,
     AuthenticationError,
     NotFoundError,
     PermissionError,
     RateLimitError,
     ServerError,
+    UnknownError,
     ValidationError,
 )
 from aipolabs.meta_functions import (
@@ -23,10 +37,32 @@ from aipolabs.meta_functions import (
     AipolabsSearchApps,
     AipolabsSearchFunctions,
 )
-from aipolabs.utils.logging import SensitiveHeadersFilter
+from aipolabs.utils._logging import SensitiveHeadersFilter
 
 logger: logging.Logger = logging.getLogger(__name__)
 logger.addFilter(SensitiveHeadersFilter())
+
+
+retry_config = {
+    "stop": stop_after_attempt(DEFAULT_MAX_RETRIES),
+    "wait": wait_exponential(
+        multiplier=DEFAULT_RETRY_MULTIPLIER,
+        min=DEFAULT_RETRY_MIN_WAIT,
+        max=DEFAULT_RETRY_MAX_WAIT,
+    ),
+    "retry": retry_if_exception_type(
+        (
+            ServerError,
+            RateLimitError,
+            UnknownError,
+            httpx.TimeoutException,
+            httpx.NetworkError,
+        )
+    ),
+    "before": before_log(logger, logging.DEBUG),
+    "after": after_log(logger, logging.DEBUG),
+    "reraise": True,
+}
 
 
 class Aipolabs:
@@ -100,6 +136,7 @@ class Aipolabs:
             # TODO: check function exist if not return AipolabsFunctionCallType.UNKNOWN
             return self.execute_function(function_name, function_parameters)
 
+    @retry(**retry_config)
     def search_apps(self, params: AipolabsSearchApps.AppSearchParams) -> Any:
         # TODO: exclude_unset
         logger.info(f"Searching apps with params: {params.model_dump(exclude_unset=True)}")
@@ -110,6 +147,7 @@ class Aipolabs:
 
         return self._handle_response(response)
 
+    @retry(**retry_config)
     def search_functions(self, params: AipolabsSearchFunctions.FunctionSearchParams) -> Any:
         logger.info(f"Searching functions with params: {params.model_dump(exclude_unset=True)}")
         response = self.client.get(
@@ -119,6 +157,7 @@ class Aipolabs:
 
         return self._handle_response(response)
 
+    @retry(**retry_config)
     def get_function_definition(self, function_name: str) -> Any:
         logger.info(f"Getting function definition of {function_name}")
         response = self.client.get(
@@ -128,6 +167,7 @@ class Aipolabs:
 
         return self._handle_response(response)
 
+    @retry(**retry_config)
     def execute_function(self, function_name: str, function_parameters: dict) -> Any:
         logger.info(
             f"Executing function with name: {function_name} and params: {function_parameters}"
@@ -164,7 +204,7 @@ class Aipolabs:
 
         if response.status_code == 200:
             return response_json
-
+        # TODO: cross-check with backend
         if response.status_code == 401:
             raise AuthenticationError(error_message, response.status_code, response.text)
         elif response.status_code == 403:
@@ -178,7 +218,7 @@ class Aipolabs:
         elif 500 <= response.status_code < 600:
             raise ServerError(error_message, response.status_code, response.text)
         else:
-            raise AipolabsError(
+            raise UnknownError(
                 f"Unexpected error occurred. Status code: {response.status_code}",
                 response.status_code,
                 response.text,

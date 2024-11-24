@@ -49,3 +49,9 @@ class ServerError(AipolabsError):
     """Raised when server errors occur (500-series)"""
 
     pass
+
+
+class UnknownError(AipolabsError):
+    """Raised when an unknown error occurs"""
+
+    pass

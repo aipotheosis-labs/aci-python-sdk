@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 from aipolabs import Aipolabs, meta_functions
-from aipolabs.utils.logging import create_headline
+from aipolabs.utils._logging import create_headline
 
 load_dotenv()
 

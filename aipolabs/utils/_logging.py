@@ -4,7 +4,7 @@ import shutil
 
 from typing_extensions import override
 
-from aipolabs.utils.type_check import is_dict
+from aipolabs.utils._type_check import is_dict
 
 logger: logging.Logger = logging.getLogger("aipolabs")
 httpx_logger: logging.Logger = logging.getLogger("httpx")
