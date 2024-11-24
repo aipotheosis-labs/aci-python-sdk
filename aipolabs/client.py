@@ -18,18 +18,21 @@ from aipolabs.exceptions import (
     ServerError,
     ValidationError,
 )
-from aipolabs.tools.execute_function import (
+from aipolabs.meta_functions.execute_function import (
     AIPOLABS_EXECUTE_FUNCTION_NAME,
-    ExecuteFunctionParameters,
+    FunctionExecutionParams,
 )
-from aipolabs.tools.fetch_function_definition import (
-    AIPOLABS_FETCH_FUNCTION_DEFINITION_NAME,
-    FetchFunctionDefinitionParameters,
+from aipolabs.meta_functions.get_function_definition import (
+    AIPOLABS_GET_FUNCTION_DEFINITION_NAME,
+    GetFunctionDefinitionParams,
 )
-from aipolabs.tools.search_apps import AIPOLABS_SEARCH_APPS_NAME, SearchAppsParameters
-from aipolabs.tools.search_functions import (
+from aipolabs.meta_functions.search_apps import (
+    AIPOLABS_SEARCH_APPS_NAME,
+    AppSearchParams,
+)
+from aipolabs.meta_functions.search_functions import (
     AIPOLABS_SEARCH_FUNCTIONS_NAME,
-    SearchFunctionsParameters,
+    FunctionSearchParams,
 )
 from aipolabs.utils.logging import SensitiveHeadersFilter
 
@@ -86,25 +89,23 @@ class Aipolabs:
             f"Handling function call with name: {function_name} and params: {function_parameters}"
         )
         if function_name == AIPOLABS_SEARCH_APPS_NAME:
-            search_apps_parameters = SearchAppsParameters.model_validate(function_parameters)
+            search_apps_parameters = AppSearchParams.model_validate(function_parameters)
             return AipolabsFunctionCallType.META_SEARCH, self.search_apps(search_apps_parameters)
         elif function_name == AIPOLABS_SEARCH_FUNCTIONS_NAME:
-            search_functions_parameters = SearchFunctionsParameters.model_validate(
-                function_parameters
-            )
+            search_functions_parameters = FunctionSearchParams.model_validate(function_parameters)
             return AipolabsFunctionCallType.META_SEARCH, self.search_functions(
                 search_functions_parameters
             )
-        elif function_name == AIPOLABS_FETCH_FUNCTION_DEFINITION_NAME:
-            fetch_function_definition_parameters = FetchFunctionDefinitionParameters.model_validate(
+        elif function_name == AIPOLABS_GET_FUNCTION_DEFINITION_NAME:
+            get_function_definition_parameters = GetFunctionDefinitionParams.model_validate(
                 function_parameters
             )
-            return AipolabsFunctionCallType.META_FETCH, self.fetch_function_definition(
-                fetch_function_definition_parameters.function_name
+            return AipolabsFunctionCallType.META_GET, self.get_function_definition(
+                get_function_definition_parameters.function_name
             )
         elif function_name == AIPOLABS_EXECUTE_FUNCTION_NAME:
 
-            execute_function_parameters = ExecuteFunctionParameters.model_validate(
+            execute_function_parameters = FunctionExecutionParams.model_validate(
                 function_parameters
             )
             return AipolabsFunctionCallType.META_EXECUTE, self.execute_function(
@@ -117,7 +118,7 @@ class Aipolabs:
                 function_name, function_parameters
             )
 
-    def search_apps(self, params: SearchAppsParameters) -> Any:
+    def search_apps(self, params: AppSearchParams) -> Any:
         # TODO: exclude_unset
         logger.info(f"Searching apps with params: {params.model_dump(exclude_unset=True)}")
         response = self.client.get(
@@ -127,7 +128,7 @@ class Aipolabs:
 
         return self._handle_response(response)
 
-    def search_functions(self, params: SearchFunctionsParameters) -> Any:
+    def search_functions(self, params: FunctionSearchParams) -> Any:
         logger.info(f"Searching functions with params: {params.model_dump(exclude_unset=True)}")
         response = self.client.get(
             "functions/search",
@@ -136,8 +137,8 @@ class Aipolabs:
 
         return self._handle_response(response)
 
-    def fetch_function_definition(self, function_name: str) -> Any:
-        logger.info(f"Fetching function definition of {function_name}")
+    def get_function_definition(self, function_name: str) -> Any:
+        logger.info(f"Getting function definition of {function_name}")
         response = self.client.get(
             f"functions/{function_name}",
             params={"inference_provider": self.inference_provider},

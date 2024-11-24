@@ -5,7 +5,7 @@ from openai import OpenAI
 
 from aipolabs import (
     AIPOLABS_EXECUTE_FUNCTION,
-    AIPOLABS_FETCH_FUNCTION_DEFINITION,
+    AIPOLABS_GET_FUNCTION_DEFINITION,
     AIPOLABS_SEARCH_APPS,
     AIPOLABS_SEARCH_FUNCTIONS,
     Aipolabs,
@@ -21,10 +21,10 @@ aipolabs = Aipolabs()
 
 prompt = (
     "You are a helpful assistant with access to a unlimited number of tools via four meta functions: "
-    "AIPOLABS_SEARCH_APPS, AIPOLABS_SEARCH_FUNCTIONS, AIPOLABS_FETCH_FUNCTION_DEFINITION, and AIPOLABS_EXECUTE_FUNCTION."
+    "AIPOLABS_SEARCH_APPS, AIPOLABS_SEARCH_FUNCTIONS, AIPOLABS_GET_FUNCTION_DEFINITION, and AIPOLABS_EXECUTE_FUNCTION."
     "You can use AIPOLABS_SEARCH_APPS to find relevant apps (which include a set of functions), if you find Apps that might help with your tasks you can use AIPOLABS_SEARCH_FUNCTIONS to find relevant functions within certain apps."
     "You can also use AIPOLABS_SEARCH_FUNCTIONS directly to find relevant functions across all apps."
-    "Once you have identified the function you need to use, you can use AIPOLABS_FETCH_FUNCTION_DEFINITION to fetch the definition of the function."
+    "Once you have identified the function you need to use, you can use AIPOLABS_GET_FUNCTION_DEFINITION to get the definition of the function."
     "You can then use AIPOLABS_EXECUTE_FUNCTION to execute the function provided you have the correct parameters."
 )
 
@@ -32,7 +32,7 @@ prompt = (
 tools_meta = [
     AIPOLABS_SEARCH_APPS,
     AIPOLABS_SEARCH_FUNCTIONS,
-    AIPOLABS_FETCH_FUNCTION_DEFINITION,
+    AIPOLABS_GET_FUNCTION_DEFINITION,
     AIPOLABS_EXECUTE_FUNCTION,
 ]
 

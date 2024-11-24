@@ -1,12 +1,12 @@
 """
 Optionally you can provide AIPOLABS_EXECUTE_FUNCTION as one of the tools to the LLM.
-This is an alternative approach to appending the fetched function definition to the tools list.
+This is an alternative approach to appending the retrieved function definition to the tools list.
 """
 
 from pydantic import BaseModel
 
-from aipolabs.tools.fetch_function_definition import (
-    AIPOLABS_FETCH_FUNCTION_DEFINITION_NAME,
+from aipolabs.meta_functions.get_function_definition import (
+    AIPOLABS_GET_FUNCTION_DEFINITION_NAME,
 )
 
 AIPOLABS_EXECUTE_FUNCTION_NAME = "AIPOLABS_EXECUTE_FUNCTION"
@@ -14,17 +14,17 @@ AIPOLABS_EXECUTE_FUNCTION = {
     "type": "function",
     "function": {
         "name": AIPOLABS_EXECUTE_FUNCTION_NAME,
-        "description": "Execute a specific fetched function. Provide the executable function name, and the required function parameters for that function based on function definition fetched.",
+        "description": "Execute a specific retrieved function. Provide the executable function name, and the required function parameters for that function based on function definition retrieved.",
         "parameters": {
             "type": "object",
             "properties": {
                 "function_name": {
                     "type": "string",
-                    "description": f"The name of the function to execute, as provided in the content retrieved from the {AIPOLABS_FETCH_FUNCTION_DEFINITION_NAME} function.",
+                    "description": f"The name of the function to execute, as provided in the content retrieved from the {AIPOLABS_GET_FUNCTION_DEFINITION_NAME} function.",
                 },
                 "function_parameters": {
                     "type": "object",
-                    "description": "This object contains the all input parameters in key-value pairs needed to execute the specified function. The required parameters depend on the 'function_name' and are provided in the function definition fetched. For functions without parameters, provide an empty object",
+                    "description": "This object contains the all input parameters in key-value pairs needed to execute the specified function. The required parameters depend on the 'function_name' and are provided in the function definition retrieved. For functions without parameters, provide an empty object",
                     "additionalProperties": True,
                 },
             },
@@ -35,7 +35,7 @@ AIPOLABS_EXECUTE_FUNCTION = {
 }
 
 
-class ExecuteFunctionParameters(BaseModel):
+class FunctionExecutionParams(BaseModel):
     function_name: str
     function_parameters: dict
 

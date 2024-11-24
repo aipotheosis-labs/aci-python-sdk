@@ -15,7 +15,7 @@ aipolabs = Aipolabs()
 
 
 def main() -> None:
-    brave_search_function_definition = aipolabs.fetch_function_definition(
+    brave_search_function_definition = aipolabs.get_function_definition(
         Function.BRAVE_SEARCH__WEB_SEARCH
     )
 

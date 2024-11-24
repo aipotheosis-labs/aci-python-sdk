@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
 AIPOLABS_SEARCH_APPS_NAME = "AIPOLABS_SEARCH_APPS"
+
 AIPOLABS_SEARCH_APPS = {
     "type": "function",
     "function": {
@@ -34,7 +35,14 @@ AIPOLABS_SEARCH_APPS = {
 }
 
 
-class SearchAppsParameters(BaseModel):
+class AppSearchParams(BaseModel):
+    """Parameters for filtering applications.
+
+    Parameters should be identical to the ones on the server side.
+
+    TODO: Add categories field.
+    """
+
     intent: str | None = None
     limit: int | None = None
     offset: int | None = None

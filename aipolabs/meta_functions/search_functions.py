@@ -40,7 +40,12 @@ AIPOLABS_SEARCH_FUNCTIONS = {
 }
 
 
-class SearchFunctionsParameters(BaseModel):
+class FunctionSearchParams(BaseModel):
+    """Parameters for searching functions.
+
+    Parameters should be identical to the ones on the server side.
+    """
+
     app_names: list[str] | None = None
     intent: str | None = None
     limit: int | None = None
