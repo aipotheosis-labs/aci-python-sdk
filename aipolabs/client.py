@@ -7,7 +7,6 @@ from typing import Any
 
 import httpx
 
-from aipolabs.enums.function_call_type import AipolabsFunctionCallType
 from aipolabs.exceptions import (
     AipolabsError,
     APIKeyNotFound,
@@ -18,21 +17,11 @@ from aipolabs.exceptions import (
     ServerError,
     ValidationError,
 )
-from aipolabs.meta_functions.execute_function import (
-    AIPOLABS_EXECUTE_FUNCTION_NAME,
-    FunctionExecutionParams,
-)
-from aipolabs.meta_functions.get_function_definition import (
-    AIPOLABS_GET_FUNCTION_DEFINITION_NAME,
-    GetFunctionDefinitionParams,
-)
-from aipolabs.meta_functions.search_apps import (
-    AIPOLABS_SEARCH_APPS_NAME,
-    AppSearchParams,
-)
-from aipolabs.meta_functions.search_functions import (
-    AIPOLABS_SEARCH_FUNCTIONS_NAME,
-    FunctionSearchParams,
+from aipolabs.meta_functions import (
+    AipolabsExecuteFunction,
+    AipolabsGetFunctionDefinition,
+    AipolabsSearchApps,
+    AipolabsSearchFunctions,
 )
 from aipolabs.utils.logging import SensitiveHeadersFilter
 
@@ -73,9 +62,7 @@ class Aipolabs:
         }
         self.client = httpx.Client(base_url=self.base_url, headers=self.headers)
 
-    def handle_function_call(
-        self, function_name: str, function_parameters: dict
-    ) -> tuple[AipolabsFunctionCallType, Any]:
+    def handle_function_call(self, function_name: str, function_parameters: dict) -> Any:
         """Handle a function call.
 
         Args:
@@ -83,42 +70,37 @@ class Aipolabs:
             function_parameters: The parameters of the function to call.
 
         Returns:
-            A tuple with the type of the function call and the result of the function call.
+            The result of the function call.
         """
         logger.info(
             f"Handling function call with name: {function_name} and params: {function_parameters}"
         )
-        if function_name == AIPOLABS_SEARCH_APPS_NAME:
-            search_apps_parameters = AppSearchParams.model_validate(function_parameters)
-            return AipolabsFunctionCallType.META_SEARCH, self.search_apps(search_apps_parameters)
-        elif function_name == AIPOLABS_SEARCH_FUNCTIONS_NAME:
-            search_functions_parameters = FunctionSearchParams.model_validate(function_parameters)
-            return AipolabsFunctionCallType.META_SEARCH, self.search_functions(
-                search_functions_parameters
-            )
-        elif function_name == AIPOLABS_GET_FUNCTION_DEFINITION_NAME:
-            get_function_definition_parameters = GetFunctionDefinitionParams.model_validate(
+        if function_name == AipolabsSearchApps.NAME:
+            search_apps_parameters = AipolabsSearchApps.validate_params(function_parameters)
+            return self.search_apps(search_apps_parameters)
+        elif function_name == AipolabsSearchFunctions.NAME:
+            search_functions_parameters = AipolabsSearchFunctions.validate_params(
                 function_parameters
             )
-            return AipolabsFunctionCallType.META_GET, self.get_function_definition(
-                get_function_definition_parameters.function_name
-            )
-        elif function_name == AIPOLABS_EXECUTE_FUNCTION_NAME:
-
-            execute_function_parameters = FunctionExecutionParams.model_validate(
+            return self.search_functions(search_functions_parameters)
+        elif function_name == AipolabsGetFunctionDefinition.NAME:
+            get_function_definition_parameters = AipolabsGetFunctionDefinition.validate_params(
                 function_parameters
             )
-            return AipolabsFunctionCallType.META_EXECUTE, self.execute_function(
+            return self.get_function_definition(get_function_definition_parameters.function_name)
+        elif function_name == AipolabsExecuteFunction.NAME:
+            execute_function_parameters = AipolabsExecuteFunction.validate_params(
+                function_parameters
+            )
+            return self.execute_function(
                 execute_function_parameters.function_name,
                 execute_function_parameters.function_parameters,
             )
         else:
             # TODO: check function exist if not return AipolabsFunctionCallType.UNKNOWN
-            return AipolabsFunctionCallType.DIRECT_EXECUTE, self.execute_function(
-                function_name, function_parameters
-            )
+            return self.execute_function(function_name, function_parameters)
 
-    def search_apps(self, params: AppSearchParams) -> Any:
+    def search_apps(self, params: AipolabsSearchApps.AppSearchParams) -> Any:
         # TODO: exclude_unset
         logger.info(f"Searching apps with params: {params.model_dump(exclude_unset=True)}")
         response = self.client.get(
@@ -128,7 +110,7 @@ class Aipolabs:
 
         return self._handle_response(response)
 
-    def search_functions(self, params: FunctionSearchParams) -> Any:
+    def search_functions(self, params: AipolabsSearchFunctions.FunctionSearchParams) -> Any:
         logger.info(f"Searching functions with params: {params.model_dump(exclude_unset=True)}")
         response = self.client.get(
             "functions/search",

@@ -3,13 +3,7 @@ import json
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from aipolabs import (
-    AIPOLABS_EXECUTE_FUNCTION,
-    AIPOLABS_GET_FUNCTION_DEFINITION,
-    AIPOLABS_SEARCH_APPS,
-    AIPOLABS_SEARCH_FUNCTIONS,
-    Aipolabs,
-)
+from aipolabs import Aipolabs, meta_functions
 from aipolabs.utils.logging import create_headline
 
 load_dotenv()
@@ -30,10 +24,10 @@ prompt = (
 
 # aipolabs meta functions for the LLM to discover the available executale functions dynamically
 tools_meta = [
-    AIPOLABS_SEARCH_APPS,
-    AIPOLABS_SEARCH_FUNCTIONS,
-    AIPOLABS_GET_FUNCTION_DEFINITION,
-    AIPOLABS_EXECUTE_FUNCTION,
+    meta_functions.AipolabsSearchApps.SCHEMA,
+    meta_functions.AipolabsSearchFunctions.SCHEMA,
+    meta_functions.AipolabsGetFunctionDefinition.SCHEMA,
+    meta_functions.AipolabsExecuteFunction.SCHEMA,
 ]
 
 
@@ -79,7 +73,7 @@ def main() -> None:
             )
 
             chat_history.append({"role": "assistant", "tool_calls": [tool_call]})
-            function_call_type, result = aipolabs.handle_function_call(
+            result = aipolabs.handle_function_call(
                 tool_call.function.name, json.loads(tool_call.function.arguments)
             )
 

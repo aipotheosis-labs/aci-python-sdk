@@ -1,10 +1,10 @@
 from pydantic import BaseModel
 
-AIPOLABS_SEARCH_FUNCTIONS_NAME = "AIPOLABS_SEARCH_FUNCTIONS"
-AIPOLABS_SEARCH_FUNCTIONS = {
+NAME = "AIPOLABS_SEARCH_FUNCTIONS"
+SCHEMA = {
     "type": "function",
     "function": {
-        "name": AIPOLABS_SEARCH_FUNCTIONS_NAME,
+        "name": NAME,
         "description": "This function allows you to find relevant executable functions that can help complete your tasks or get data and information you need.",
         "parameters": {
             "type": "object",
@@ -50,3 +50,7 @@ class FunctionSearchParams(BaseModel):
     intent: str | None = None
     limit: int | None = None
     offset: int | None = None
+
+
+def validate_params(params: dict) -> FunctionSearchParams:
+    return FunctionSearchParams.model_validate(params)  # type: ignore[no-any-return]

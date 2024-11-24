@@ -5,22 +5,20 @@ This is an alternative approach to appending the retrieved function definition t
 
 from pydantic import BaseModel
 
-from aipolabs.meta_functions.get_function_definition import (
-    AIPOLABS_GET_FUNCTION_DEFINITION_NAME,
-)
+from aipolabs.meta_functions import AipolabsGetFunctionDefinition
 
-AIPOLABS_EXECUTE_FUNCTION_NAME = "AIPOLABS_EXECUTE_FUNCTION"
-AIPOLABS_EXECUTE_FUNCTION = {
+NAME = "AIPOLABS_EXECUTE_FUNCTION"
+SCHEMA = {
     "type": "function",
     "function": {
-        "name": AIPOLABS_EXECUTE_FUNCTION_NAME,
+        "name": NAME,
         "description": "Execute a specific retrieved function. Provide the executable function name, and the required function parameters for that function based on function definition retrieved.",
         "parameters": {
             "type": "object",
             "properties": {
                 "function_name": {
                     "type": "string",
-                    "description": f"The name of the function to execute, as provided in the content retrieved from the {AIPOLABS_GET_FUNCTION_DEFINITION_NAME} function.",
+                    "description": f"The name of the function to execute, which is retrieved from the {AipolabsGetFunctionDefinition.NAME} function.",
                 },
                 "function_parameters": {
                     "type": "object",
@@ -57,3 +55,7 @@ class FunctionExecutionParams(BaseModel):
             }
             return super().model_validate(processed_obj, *args, **kwargs)
         return super().model_validate(obj, *args, **kwargs)
+
+
+def validate_params(params: dict) -> FunctionExecutionParams:
+    return FunctionExecutionParams.model_validate(params)  # type: ignore[no-any-return]

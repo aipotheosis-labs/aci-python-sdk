@@ -3,13 +3,7 @@ import json
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from aipolabs import (
-    AIPOLABS_GET_FUNCTION_DEFINITION,
-    AIPOLABS_SEARCH_APPS,
-    AIPOLABS_SEARCH_FUNCTIONS,
-    Aipolabs,
-    AipolabsFunctionCallType,
-)
+from aipolabs import Aipolabs, meta_functions
 from aipolabs.utils.logging import create_headline
 
 load_dotenv()
@@ -30,9 +24,9 @@ prompt = (
 
 # aipolabs meta functions for the LLM to discover the available executale functions dynamically
 tools_meta = [
-    AIPOLABS_SEARCH_APPS,
-    AIPOLABS_SEARCH_FUNCTIONS,
-    AIPOLABS_GET_FUNCTION_DEFINITION,
+    meta_functions.AipolabsSearchApps.SCHEMA,
+    meta_functions.AipolabsSearchFunctions.SCHEMA,
+    meta_functions.AipolabsGetFunctionDefinition.SCHEMA,
 ]
 # store retrieved function definitions (via meta functions) that will be used in the next iteration,
 # can dynamically append or remove functions from this list
@@ -81,11 +75,11 @@ def main() -> None:
             )
 
             chat_history.append({"role": "assistant", "tool_calls": [tool_call]})
-            function_call_type, result = aipolabs.handle_function_call(
+            result = aipolabs.handle_function_call(
                 tool_call.function.name, json.loads(tool_call.function.arguments)
             )
             # if the function call is a get, add the retrieved function definition to the tools_retrieved
-            if function_call_type == AipolabsFunctionCallType.META_GET:
+            if tool_call.function.name == meta_functions.AipolabsGetFunctionDefinition.NAME:
                 tools_retrieved.append(result)
 
             print(f"{create_headline('Function Call Result')} \n {result}")

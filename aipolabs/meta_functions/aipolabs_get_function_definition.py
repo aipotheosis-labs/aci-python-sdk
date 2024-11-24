@@ -1,11 +1,11 @@
 from pydantic import BaseModel
 
-AIPOLABS_GET_FUNCTION_DEFINITION_NAME = "AIPOLABS_GET_FUNCTION_DEFINITION"
+NAME = "AIPOLABS_GET_FUNCTION_DEFINITION"
 
-AIPOLABS_GET_FUNCTION_DEFINITION = {
+SCHEMA = {
     "type": "function",
     "function": {
-        "name": AIPOLABS_GET_FUNCTION_DEFINITION_NAME,
+        "name": NAME,
         "description": "This function allows you to get the definition of an executable function.",
         "parameters": {
             "type": "object",
@@ -29,3 +29,7 @@ class GetFunctionDefinitionParams(BaseModel):
     """
 
     function_name: str
+
+
+def validate_params(params: dict) -> GetFunctionDefinitionParams:
+    return GetFunctionDefinitionParams.model_validate(params)  # type: ignore[no-any-return]

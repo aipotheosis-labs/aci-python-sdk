@@ -1,11 +1,11 @@
 from pydantic import BaseModel
 
-AIPOLABS_SEARCH_APPS_NAME = "AIPOLABS_SEARCH_APPS"
+NAME = "AIPOLABS_SEARCH_APPS"
 
-AIPOLABS_SEARCH_APPS = {
+SCHEMA = {
     "type": "function",
     "function": {
-        "name": AIPOLABS_SEARCH_APPS_NAME,
+        "name": NAME,
         "description": "This function allows you to find relevant apps (which includeds a set of functions) that can help complete your tasks or get data and information you need.",
         "parameters": {
             "type": "object",
@@ -46,3 +46,7 @@ class AppSearchParams(BaseModel):
     intent: str | None = None
     limit: int | None = None
     offset: int | None = None
+
+
+def validate_params(params: dict) -> AppSearchParams:
+    return AppSearchParams.model_validate(params)  # type: ignore[no-any-return]
