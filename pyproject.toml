@@ -41,6 +41,7 @@ isort = "^5.13.2"
 pre-commit = "^4.0.0"
 openai = "^1.51.2" # used for examples
 python-dotenv = "^1.0.1"
+respx = "^0.21.1"
 
 
 [tool.black]

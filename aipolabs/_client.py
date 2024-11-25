@@ -16,6 +16,7 @@ from tenacity import (
 )
 
 from aipolabs._constants import (
+    DEFAULT_AIPOLABS_BASE_URL,
     DEFAULT_MAX_RETRIES,
     DEFAULT_RETRY_MAX_WAIT,
     DEFAULT_RETRY_MIN_WAIT,
@@ -76,8 +77,8 @@ class Aipolabs:
             api_key: The API key to use for authentication.
             base_url: The base URL to use for the API requests.
             If values are not provided it will try to read from the corresponding environment variables.
-
-
+            If no value found for api_key, it will raise APIKeyNotFound.
+            If no value found for base_url, it will use the default value.
         """
         if api_key is None:
             api_key = os.environ.get("AIPOLABS_API_KEY")
@@ -86,9 +87,7 @@ class Aipolabs:
         self.api_key = api_key
 
         if base_url is None:
-            base_url = os.environ.get("AIPOLABS_BASE_URL")
-        if base_url is None:
-            base_url = "https://api.aipolabs.xyz/v1"
+            base_url = os.environ.get("AIPOLABS_BASE_URL", DEFAULT_AIPOLABS_BASE_URL)
         self.base_url = self._enforce_trailing_slash(httpx.URL(base_url))
         # TODO: currently only openai is supported
         self.inference_provider = "openai"
