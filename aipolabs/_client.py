@@ -303,37 +303,42 @@ class Aipolabs:
             ServerError: For 5xx status codes.
             UnknownError: For unexpected status codes.
         """
+
+        # TODO: possible non-json response?
         try:
-            response_json = response.json() if response.content else None
+            response_data = response.json() if response.content else {}
         except json.JSONDecodeError:
-            response_json = None
+            logger.warning(f"JSONDecodeError: {response.text}")
+            response_data = response.text
 
-        error_message: str
-        if isinstance(response_json, dict):
-            error_message = str(
-                response_json.get("message") or response_json.get("error") or response.text
-            )
-        else:
-            error_message = response.text
+        try:
+            response.raise_for_status()
+            return response_data
+        except httpx.HTTPStatusError:
+            error_message: str
+            if isinstance(response_data, dict):
+                error_message = str(
+                    response_data.get("message") or response_data.get("error") or response.text
+                )
+            else:
+                error_message = response.text
 
-        if response.status_code == 200:
-            return response_json
-        # TODO: cross-check with backend
-        if response.status_code == 401:
-            raise AuthenticationError(error_message, response.status_code, response.text)
-        elif response.status_code == 403:
-            raise PermissionError(error_message, response.status_code, response.text)
-        elif response.status_code == 404:
-            raise NotFoundError(error_message, response.status_code, response.text)
-        elif response.status_code == 400:
-            raise ValidationError(error_message, response.status_code, response.text)
-        elif response.status_code == 429:
-            raise RateLimitError(error_message, response.status_code, response.text)
-        elif 500 <= response.status_code < 600:
-            raise ServerError(error_message, response.status_code, response.text)
-        else:
-            raise UnknownError(
-                f"Unexpected error occurred. Status code: {response.status_code}",
-                response.status_code,
-                response.text,
-            )
+            # TODO: cross-check with backend
+            if response.status_code == 401:
+                raise AuthenticationError(error_message, response.status_code, response.text)
+            elif response.status_code == 403:
+                raise PermissionError(error_message, response.status_code, response.text)
+            elif response.status_code == 404:
+                raise NotFoundError(error_message, response.status_code, response.text)
+            elif response.status_code == 400:
+                raise ValidationError(error_message, response.status_code, response.text)
+            elif response.status_code == 429:
+                raise RateLimitError(error_message, response.status_code, response.text)
+            elif 500 <= response.status_code < 600:
+                raise ServerError(error_message, response.status_code, response.text)
+            else:
+                raise UnknownError(
+                    f"Unexpected error occurred. Status code: {response.status_code}",
+                    response.status_code,
+                    response.text,
+                )
