@@ -1,3 +1,8 @@
+"""
+This module defines the AIPOLABS_SEARCH_APPS meta function, which is used by LLM to search for
+relevant applications (which include a set of functions) that can help complete a task.
+"""
+
 from pydantic import BaseModel
 
 NAME = "AIPOLABS_SEARCH_APPS"
@@ -35,7 +40,7 @@ SCHEMA = {
 }
 
 
-class AppSearchParams(BaseModel):
+class SearchAppsParams(BaseModel):
     """Parameters for filtering applications.
 
     Parameters should be identical to the ones on the server side.
@@ -48,5 +53,15 @@ class AppSearchParams(BaseModel):
     offset: int | None = None
 
 
-def validate_params(params: dict) -> AppSearchParams:
-    return AppSearchParams.model_validate(params)  # type: ignore[no-any-return]
+class App(BaseModel):
+    """Representation of an application. Search results will return a list of these.
+
+    Should match the schema defined on the server side.
+    """
+
+    name: str
+    description: str
+
+
+def validate_params(params: dict) -> SearchAppsParams:
+    return SearchAppsParams.model_validate(params)  # type: ignore[no-any-return]

@@ -1,3 +1,13 @@
+"""
+This module defines the AIPOLABS_GET_FUNCTION_DEFINITION meta function, which is used by LLM to retrieve
+the definition of an executable function.
+
+The function requires one key parameter:
+1. function_name: The name of the function to get the definition for. e.g. `BRAVE_SEARCH__WEB_SEARCH`
+
+It returns json schema of the function definition.
+"""
+
 from pydantic import BaseModel
 
 NAME = "AIPOLABS_GET_FUNCTION_DEFINITION"

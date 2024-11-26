@@ -1,7 +1,12 @@
 """
-Optionally you can provide AIPOLABS_EXECUTE_FUNCTION as one of the tools to the LLM.
-This is an alternative approach to appending the retrieved function definition to the tools list.
+This module defines the AIPOLABS_EXECUTE_FUNCTION meta function, which is used by LLM to submit
+execution requests for indexed functions on aipolabs backend.
+
+This module includes the schema definition for the function and a Pydantic model for
+validating the execution parameters.
 """
+
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -34,6 +39,16 @@ SCHEMA = {
 
 
 class FunctionExecutionParams(BaseModel):
+    """Parameters for executing a function.
+
+    The function requires two key parameters:
+    1. function_name: The name of the function to execute, which is the function name of the function that is
+    retrieved using the AIPOLABS_GET_FUNCTION_DEFINITION meta function.
+    2. function_parameters: A dictionary containing all input parameters required to execute
+    the specified function. These parameters are also provided by the function definition
+    retrieved using the AIPOLABS_GET_FUNCTION_DEFINITION meta function. If a function does not require parameters, an empty dictionary should be provided.
+    """
+
     function_name: str
     function_parameters: dict
 
@@ -57,5 +72,20 @@ class FunctionExecutionParams(BaseModel):
         return super().model_validate(obj, *args, **kwargs)
 
 
+class FunctionExecutionResult(BaseModel):
+    """Result of a Aipolabs indexed function (e.g. BRAVE_SEARCH__WEB_SEARCH) execution.
+    Should be identical to the class defined on server side.
+    """
+
+    success: bool
+    data: Any | None = None
+    error: str | None = None
+
+
 def validate_params(params: dict) -> FunctionExecutionParams:
+    """Validate the parameters for executing a function.
+
+    Returns:
+        FunctionExecutionParams: The validated pydantic model instance.
+    """
     return FunctionExecutionParams.model_validate(params)  # type: ignore[no-any-return]
