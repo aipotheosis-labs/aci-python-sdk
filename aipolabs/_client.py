@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import logging
 import os
 from typing import Any
@@ -111,14 +110,7 @@ class Aipolabs:
         }
         self.client = httpx.Client(base_url=self.base_url, headers=self.headers)
 
-    def handle_function_call(
-        self, function_name: str, function_parameters: dict
-    ) -> (
-        list[AipolabsSearchApps.App]
-        | list[AipolabsSearchFunctions.Function]
-        | dict
-        | AipolabsExecuteFunction.FunctionExecutionResult
-    ):
+    def handle_function_call(self, function_name: str, function_parameters: dict) -> Any:
         """Routes and executes function calls based on the function name.
         This can be a convenience function to handle function calls from LLM without you checking the function name.
 
@@ -138,28 +130,45 @@ class Aipolabs:
         )
         if function_name == AipolabsSearchApps.NAME:
             search_apps_parameters = AipolabsSearchApps.validate_params(function_parameters)
-            return self.search_apps(search_apps_parameters)  # type: ignore[no-any-return]
+            apps = self.search_apps(search_apps_parameters)
+
+            return [app.model_dump() for app in apps]
+
         elif function_name == AipolabsSearchFunctions.NAME:
             search_functions_parameters = AipolabsSearchFunctions.validate_params(
                 function_parameters
             )
-            return self.search_functions(search_functions_parameters)  # type: ignore[no-any-return]
+            functions = self.search_functions(search_functions_parameters)
+
+            return [function.model_dump() for function in functions]
+
         elif function_name == AipolabsGetFunctionDefinition.NAME:
             get_function_definition_parameters = AipolabsGetFunctionDefinition.validate_params(
                 function_parameters
             )
-            return self.get_function_definition(get_function_definition_parameters.function_name)  # type: ignore[no-any-return]
+            function_definition: dict = self.get_function_definition(
+                get_function_definition_parameters.function_name
+            )
+
+            return function_definition
+
         elif function_name == AipolabsExecuteFunction.NAME:
             execute_function_parameters = AipolabsExecuteFunction.validate_params(
                 function_parameters
             )
-            return self.execute_function(  # type: ignore[no-any-return]
+
+            function_execution_result = self.execute_function(
                 execute_function_parameters.function_name,
                 execute_function_parameters.function_parameters,
             )
+
+            return function_execution_result.model_dump(exclude_none=True)
+
         else:
             # TODO: check function exist if not throw excpetion?
-            return self.execute_function(function_name, function_parameters)  # type: ignore[no-any-return]
+            function_execution_result = self.execute_function(function_name, function_parameters)
+
+            return function_execution_result.model_dump(exclude_none=True)
 
     @retry(**retry_config)
     def search_apps(
@@ -304,41 +313,47 @@ class Aipolabs:
             UnknownError: For unexpected status codes.
         """
 
-        # TODO: possible non-json response?
-        try:
-            response_data = response.json() if response.content else {}
-        except json.JSONDecodeError:
-            logger.warning(f"JSONDecodeError: {response.text}")
-            response_data = response.text
-
         try:
             response.raise_for_status()
-            return response_data
-        except httpx.HTTPStatusError:
-            error_message: str
-            if isinstance(response_data, dict):
-                error_message = str(
-                    response_data.get("message") or response_data.get("error") or response.text
-                )
-            else:
-                error_message = response.text
+            return self._get_response_data(response)
+
+        except httpx.HTTPStatusError as e:
+            error_message = self._get_error_message(response, e)
 
             # TODO: cross-check with backend
             if response.status_code == 401:
-                raise AuthenticationError(error_message, response.status_code, response.text)
+                raise AuthenticationError(error_message)
             elif response.status_code == 403:
-                raise PermissionError(error_message, response.status_code, response.text)
+                raise PermissionError(error_message)
             elif response.status_code == 404:
-                raise NotFoundError(error_message, response.status_code, response.text)
+                raise NotFoundError(error_message)
             elif response.status_code == 400:
-                raise ValidationError(error_message, response.status_code, response.text)
+                raise ValidationError(error_message)
             elif response.status_code == 429:
-                raise RateLimitError(error_message, response.status_code, response.text)
+                raise RateLimitError(error_message)
             elif 500 <= response.status_code < 600:
-                raise ServerError(error_message, response.status_code, response.text)
+                raise ServerError(error_message)
             else:
-                raise UnknownError(
-                    f"Unexpected error occurred. Status code: {response.status_code}",
-                    response.status_code,
-                    response.text,
-                )
+                raise UnknownError(error_message)
+
+    def _get_response_data(self, response: httpx.Response) -> Any:
+        """Get the response data from the response.
+        If the response is json, return the json data, otherwise fallback to the text.
+        TODO: handle non-json response?
+        """
+        try:
+            response_data = response.json() if response.content else {}
+        except Exception as e:
+            logger.warning(f"error parsing json response: {str(e)}")
+            response_data = response.text
+
+        return response_data
+
+    def _get_error_message(self, response: httpx.Response, error: httpx.HTTPStatusError) -> str:
+        """Get the error message from the response or fallback to the error message from the HTTPStatusError.
+        Usually the response json contains more details about the error.
+        """
+        try:
+            return str(response.json())
+        except Exception:
+            return str(error)

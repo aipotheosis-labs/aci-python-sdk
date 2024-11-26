@@ -20,6 +20,7 @@ prompt = (
     "You can also use AIPOLABS_SEARCH_FUNCTIONS directly to find relevant functions across all apps."
     "Once you have identified the function you need to use, you can use AIPOLABS_GET_FUNCTION_DEFINITION to get the definition of the function."
     "You can then use AIPOLABS_EXECUTE_FUNCTION to execute the function provided you have the correct parameters."
+    "So the typical order is AIPOLABS_SEARCH_APPS -> AIPOLABS_SEARCH_FUNCTIONS -> AIPOLABS_GET_FUNCTION_DEFINITION -> AIPOLABS_EXECUTE_FUNCTION."
 )
 
 # aipolabs meta functions for the LLM to discover the available executale functions dynamically
@@ -46,7 +47,7 @@ def main() -> None:
                 },
                 {
                     "role": "user",
-                    "content": "get me some online information about aipolabs",
+                    "content": "Get me some online information about aipolabs. Use whichever search tool you find most suitable for the taskvia AIPOLABS meta functions.",
                 },
             ]
             + chat_history,

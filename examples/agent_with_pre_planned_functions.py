@@ -52,10 +52,10 @@ def main() -> None:
         )
         print(create_headline("Function execution result"))
         # result["success"] indicates whether the function execution (not the request itself) was successful
-        if result["success"]:
-            print(result["data"])
+        if result.success:
+            print(result.data)
         else:
-            print(result["error"])
+            print(result.error)
 
 
 if __name__ == "__main__":

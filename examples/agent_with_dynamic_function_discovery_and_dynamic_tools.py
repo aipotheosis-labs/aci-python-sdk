@@ -48,7 +48,7 @@ def main() -> None:
                 },
                 {
                     "role": "user",
-                    "content": "get me some online information about aipolabs",
+                    "content": "Get me some online information about aipolabs. Use whichever search tool you find most suitable for the taskvia AIPOLABS meta functions.",
                 },
             ]
             + chat_history,

@@ -234,11 +234,9 @@ def test_execute_function_unknown_error() -> None:
         return_value=httpx.Response(418, json={"message": "I'm a teapot"})
     )
 
-    with pytest.raises(UnknownError) as exc_info:
+    with pytest.raises(UnknownError):
         client.execute_function(function_name, function_parameters)
 
-    assert "Unexpected error occurred" in str(exc_info.value)
-    assert "Status code: 418" in str(exc_info.value)
     assert route.call_count == DEFAULT_MAX_RETRIES, "should retry"
 
 
@@ -337,10 +335,7 @@ def test_handle_function_call_search_apps() -> None:
     )
 
     response = client.handle_function_call(function_name, function_parameters)
-    assert isinstance(response, list)
-    assert len(response) == 1
-    assert isinstance(response[0], AipolabsSearchApps.App)
-    assert response[0].model_dump() == mock_response[0]
+    assert response == mock_response
     assert route.call_count == 1, "should not retry"
 
 
@@ -356,10 +351,7 @@ def test_handle_function_call_search_functions() -> None:
     )
 
     response = client.handle_function_call(function_name, function_parameters)
-    assert isinstance(response, list)
-    assert len(response) == 1
-    assert isinstance(response[0], AipolabsSearchFunctions.Function)
-    assert response[0].model_dump() == mock_response[0]
+    assert response == mock_response
     assert route.call_count == 1, "should not retry"
 
 
@@ -392,8 +384,7 @@ def test_handle_function_call_execute_function() -> None:
     )
 
     response = client.handle_function_call(function_name, function_parameters)
-    assert isinstance(response, AipolabsExecuteFunction.FunctionExecutionResult)
-    assert response.model_dump(exclude_none=True) == mock_response
+    assert response == mock_response
     assert route.call_count == 1, "should not retry"
 
 
@@ -402,13 +393,15 @@ def test_handle_function_call_execute_indexed_execution() -> None:
     client = create_test_client()
     function_name = "BRAVE_SEARCH__WEB_SEARCH"
     function_parameters = {"query": "test"}
-    mock_response = {"success": True, "data": "string"}
+    mock_response = {
+        "success": True,
+        "data": {"results": [{"title": "Test Result"}], "metadata": None},
+    }
 
     route = respx.post(f"{BASE_URL}functions/{function_name}/execute").mock(
         return_value=httpx.Response(200, json=mock_response)
     )
-
     response = client.handle_function_call(function_name, function_parameters)
-    assert isinstance(response, AipolabsExecuteFunction.FunctionExecutionResult)
-    assert response.model_dump(exclude_none=True) == mock_response
+
+    assert response == mock_response
     assert route.call_count == 1, "should not retry"
