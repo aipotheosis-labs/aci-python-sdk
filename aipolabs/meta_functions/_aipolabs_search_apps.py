@@ -64,4 +64,5 @@ class App(BaseModel):
 
 
 def validate_params(params: dict) -> SearchAppsParams:
-    return SearchAppsParams.model_validate(params)  # type: ignore[no-any-return]
+    validated_params: SearchAppsParams = SearchAppsParams.model_validate(params)
+    return validated_params

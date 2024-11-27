@@ -42,4 +42,7 @@ class GetFunctionDefinitionParams(BaseModel):
 
 
 def validate_params(params: dict) -> GetFunctionDefinitionParams:
-    return GetFunctionDefinitionParams.model_validate(params)  # type: ignore[no-any-return]
+    validated_params: GetFunctionDefinitionParams = GetFunctionDefinitionParams.model_validate(
+        params
+    )
+    return validated_params

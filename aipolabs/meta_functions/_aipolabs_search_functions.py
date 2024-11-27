@@ -70,4 +70,5 @@ class Function(BaseModel):
 
 
 def validate_params(params: dict) -> SearchFunctionsParams:
-    return SearchFunctionsParams.model_validate(params)  # type: ignore[no-any-return]
+    validated_params: SearchFunctionsParams = SearchFunctionsParams.model_validate(params)
+    return validated_params

@@ -19,3 +19,4 @@ repos:
     rev: v1.11.2  # Use the latest stable version
     hooks:
       - id: mypy
+        args: ["--config-file=mypy.ini"]

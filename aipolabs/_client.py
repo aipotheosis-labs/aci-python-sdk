@@ -123,7 +123,7 @@ class Aipolabs:
             function_parameters: Dictionary containing the parameters for the function.
 
         Returns:
-            Any: The result of the function execution. It varies based on the function.
+            Any: The result (serializable) of the function execution. It varies based on the function.
         """
         logger.info(
             f"Handling function call with name: {function_name} and params: {function_parameters}"
