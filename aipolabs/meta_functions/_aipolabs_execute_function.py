@@ -52,25 +52,6 @@ class FunctionExecutionParams(BaseModel):
     function_name: str
     function_parameters: dict
 
-    @classmethod
-    def model_validate(cls, obj: dict, *args, **kwargs):  # type: ignore[no-untyped-def]
-        # TODO: llm most time doesn't put input parameters in the function_parameters key when using AIPOLABS_EXECUTE_FUNCTION,
-        # so we need to handle that here. It is a bit hacky, we should improve this in the future
-        if "function_parameters" not in obj:
-            # Create a copy of the input dict
-            processed_obj = obj.copy()
-            if "function_name" not in processed_obj:
-                raise ValueError("function_name is required")
-            # Extract function_name
-            function_name = processed_obj.pop("function_name")
-            # Create new dict with correct structure
-            processed_obj = {
-                "function_name": function_name,
-                "function_parameters": processed_obj,  # All remaining fields go here
-            }
-            return super().model_validate(processed_obj, *args, **kwargs)
-        return super().model_validate(obj, *args, **kwargs)
-
 
 class FunctionExecutionResult(BaseModel):
     """Result of a Aipolabs indexed function (e.g. BRAVE_SEARCH__WEB_SEARCH) execution.
@@ -82,10 +63,18 @@ class FunctionExecutionResult(BaseModel):
     error: str | None = None
 
 
-def validate_params(params: dict) -> FunctionExecutionParams:
-    """Validate the parameters for executing a function.
-
-    Returns:
-        FunctionExecutionParams: The validated pydantic model instance.
-    """
-    return FunctionExecutionParams.model_validate(params)  # type: ignore[no-any-return]
+def wrap_function_parameters_if_not_present(obj: dict) -> dict:
+    if "function_parameters" not in obj:
+        # Create a copy of the input dict
+        processed_obj = obj.copy()
+        if "function_name" not in processed_obj:
+            raise ValueError("function_name is required")
+        # Extract function_name
+        function_name = processed_obj.pop("function_name")
+        # Create new dict with correct structure
+        processed_obj = {
+            "function_name": function_name,
+            "function_parameters": processed_obj,  # All remaining fields go here
+        }
+        return processed_obj
+    return obj

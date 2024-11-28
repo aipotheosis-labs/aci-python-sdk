@@ -35,14 +35,9 @@ SCHEMA = {
 class GetFunctionDefinitionParams(BaseModel):
     """Parameters for getting a function definition.
 
-    The backend require "inference_provider" parameter but this value should be set by developer not LLM when using the sdk.
+    The backend require "inference_provider" parameter but this value should be set by
+    developer not LLM when using the sdk, so inference_provider parameter is not present in SCHEMA above.
     """
 
     function_name: str
-
-
-def validate_params(params: dict) -> GetFunctionDefinitionParams:
-    validated_params: GetFunctionDefinitionParams = GetFunctionDefinitionParams.model_validate(
-        params
-    )
-    return validated_params
+    inference_provider: str | None

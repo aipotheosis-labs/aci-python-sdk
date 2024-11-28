@@ -67,8 +67,3 @@ class Function(BaseModel):
 
     name: str
     description: str
-
-
-def validate_params(params: dict) -> SearchFunctionsParams:
-    validated_params: SearchFunctionsParams = SearchFunctionsParams.model_validate(params)
-    return validated_params

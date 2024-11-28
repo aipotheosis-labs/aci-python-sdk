@@ -61,8 +61,3 @@ class App(BaseModel):
 
     name: str
     description: str
-
-
-def validate_params(params: dict) -> SearchAppsParams:
-    validated_params: SearchAppsParams = SearchAppsParams.model_validate(params)
-    return validated_params

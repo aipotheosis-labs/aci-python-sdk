@@ -129,42 +129,36 @@ class Aipolabs:
             f"Handling function call with name: {function_name} and params: {function_parameters}"
         )
         if function_name == AipolabsSearchApps.NAME:
-            search_apps_parameters = AipolabsSearchApps.validate_params(function_parameters)
-            apps = self.search_apps(search_apps_parameters)
+            apps = self.search_apps(**function_parameters)
 
             return [app.model_dump() for app in apps]
 
         elif function_name == AipolabsSearchFunctions.NAME:
-            search_functions_parameters = AipolabsSearchFunctions.validate_params(
-                function_parameters
-            )
-            functions = self.search_functions(search_functions_parameters)
+            functions = self.search_functions(**function_parameters)
 
             return [function.model_dump() for function in functions]
 
         elif function_name == AipolabsGetFunctionDefinition.NAME:
-            get_function_definition_parameters = AipolabsGetFunctionDefinition.validate_params(
-                function_parameters
-            )
-            function_definition: dict = self.get_function_definition(
-                get_function_definition_parameters.function_name
-            )
+            function_definition: dict = self.get_function_definition(**function_parameters)
 
             return function_definition
 
         elif function_name == AipolabsExecuteFunction.NAME:
-            execute_function_parameters = AipolabsExecuteFunction.validate_params(
+            # TODO: sometimes when using the fixed_tool approach llm most time doesn't put input parameters in the
+            # 'function_parameters' key as defined in AIPOLABS_EXECUTE_FUNCTION schema,
+            # so we need to handle that here. It is a bit hacky, we should improve this in the future
+            # TODO: consider adding post processing to auto fix all common errors in llm generated input parameters
+            function_parameters = AipolabsExecuteFunction.wrap_function_parameters_if_not_present(
                 function_parameters
             )
 
-            function_execution_result = self.execute_function(
-                execute_function_parameters.function_name,
-                execute_function_parameters.function_parameters,
-            )
+            function_execution_result = self.execute_function(**function_parameters)
 
             return function_execution_result.model_dump(exclude_none=True)
 
         else:
+            # If the function name is not a meta function, we assume it is a direct function execution of
+            # an aipolabs indexed function
             # TODO: check function exist if not throw excpetion?
             function_execution_result = self.execute_function(function_name, function_parameters)
 
@@ -172,12 +166,14 @@ class Aipolabs:
 
     @retry(**retry_config)
     def search_apps(
-        self, params: AipolabsSearchApps.SearchAppsParams
+        self, intent: str | None = None, limit: int | None = None, offset: int | None = None
     ) -> list[AipolabsSearchApps.App]:
         """Searches for apps using the provided parameters.
 
         Args:
-            params: Search parameters for filtering and sorting results.
+            intent: search results will be sorted by relevance to this intent.
+            limit: for pagination, maximum number of apps to return.
+            offset: for pagination, number of apps to skip before returning results.
 
         Returns:
             list[AipolabsSearchApps.App]: List of apps matching the search criteria in the order of relevance.
@@ -185,11 +181,14 @@ class Aipolabs:
         Raises:
             Various exceptions defined in _handle_response for different HTTP status codes.
         """
-        # TODO: exclude_unset
-        logger.info(f"Searching apps with params: {params.model_dump(exclude_unset=True)}")
+        validated_params = AipolabsSearchApps.SearchAppsParams(
+            intent=intent, limit=limit, offset=offset
+        ).model_dump(exclude_none=True)
+
+        logger.info(f"Searching apps with params: {validated_params}")
         response = self.client.get(
             "apps/search",
-            params=params.model_dump(exclude_unset=True),
+            params=validated_params,
         )
 
         data: list[dict] = self._handle_response(response)
@@ -199,12 +198,19 @@ class Aipolabs:
 
     @retry(**retry_config)
     def search_functions(
-        self, params: AipolabsSearchFunctions.SearchFunctionsParams
+        self,
+        app_names: list[str] | None = None,
+        intent: str | None = None,
+        limit: int | None = None,
+        offset: int | None = None,
     ) -> list[AipolabsSearchFunctions.Function]:
         """Searches for functions using the provided parameters.
 
         Args:
-            params: Search parameters for filtering functions.
+            app_names: List of app names to filter functions by.
+            intent: search results will be sorted by relevance to this intent.
+            limit: for pagination, maximum number of functions to return.
+            offset: for pagination, number of functions to skip before returning results.
 
         Returns:
             list[AipolabsSearchFunctions.Function]: List of functions matching the search criteria in the order of relevance.
@@ -212,10 +218,15 @@ class Aipolabs:
         Raises:
             Various exceptions defined in _handle_response for different HTTP status codes.
         """
-        logger.info(f"Searching functions with params: {params.model_dump(exclude_unset=True)}")
+        validated_params = AipolabsSearchFunctions.SearchFunctionsParams(
+            app_names=app_names, intent=intent, limit=limit, offset=offset
+        ).model_dump(exclude_none=True)
+
+        logger.info(f"Searching functions with params: {validated_params}")
+
         response = self.client.get(
             "functions/search",
-            params=params.model_dump(exclude_unset=True),
+            params=validated_params,
         )
 
         data: list[dict] = self._handle_response(response)
@@ -236,10 +247,17 @@ class Aipolabs:
         Raises:
             Various exceptions defined in _handle_response for different HTTP status codes.
         """
-        logger.info(f"Getting function definition of {function_name}")
+        validated_params = AipolabsGetFunctionDefinition.GetFunctionDefinitionParams(
+            function_name=function_name, inference_provider=self.inference_provider
+        )
+
+        logger.info(
+            f"Getting function definition of {validated_params.function_name}, "
+            f"format: {validated_params.inference_provider}"
+        )
         response = self.client.get(
-            f"functions/{function_name}",
-            params={"inference_provider": self.inference_provider},
+            f"functions/{validated_params.function_name}",
+            params={"inference_provider": validated_params.inference_provider},
         )
 
         function_definition: dict = self._handle_response(response)
@@ -250,26 +268,30 @@ class Aipolabs:
     def execute_function(
         self, function_name: str, function_parameters: dict
     ) -> AipolabsExecuteFunction.FunctionExecutionResult:
-        """Executes a function with the provided parameters.
+        """Executes a Aipolabs indexed function with the provided parameters.
 
         Args:
             function_name: Name of the function to execute.
-            function_parameters: Dictionary containing the parameters for the function.
+            function_parameters: Dictionary containing the input parameters for the function.
 
         Returns:
-            Any: JSON response containing the function execution results.
+            AipolabsExecuteFunction.FunctionExecutionResult: containing the function execution results.
 
         Raises:
             Various exceptions defined in _handle_response for different HTTP status codes.
         """
+        validated_params = AipolabsExecuteFunction.FunctionExecutionParams(
+            function_name=function_name, function_parameters=function_parameters
+        )
+
         logger.info(
-            f"Executing function with name: {function_name} and params: {function_parameters}"
+            f"Executing function with name: {validated_params.function_name} and params: {validated_params.function_parameters}"
         )
         request_body = {
-            "function_input": function_parameters,
+            "function_input": validated_params.function_parameters,
         }
         response = self.client.post(
-            f"functions/{function_name}/execute",
+            f"functions/{validated_params.function_name}/execute",
             json=request_body,
         )
 

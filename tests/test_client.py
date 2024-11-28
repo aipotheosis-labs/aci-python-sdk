@@ -50,16 +50,14 @@ def test_client_initialization_without_base_url() -> None:
 @respx.mock
 def test_search_apps_success() -> None:
     client = create_test_client()
-    params = AipolabsSearchApps.SearchAppsParams.model_validate(
-        {"intent": "test", "limit": 10, "offset": 0}
-    )
+
     mock_response = [{"name": "Test App", "description": "Test Description"}]
 
     route = respx.get(f"{BASE_URL}apps/search").mock(
         return_value=httpx.Response(200, json=mock_response)
     )
 
-    apps = client.search_apps(params)
+    apps = client.search_apps(intent="test", limit=10, offset=0)
     assert [app.model_dump() for app in apps] == mock_response
     assert route.call_count == 1, "should not retry"
 
@@ -67,16 +65,14 @@ def test_search_apps_success() -> None:
 @respx.mock
 def test_search_functions_success() -> None:
     client = create_test_client()
-    params = AipolabsSearchFunctions.SearchFunctionsParams.model_validate(
-        {"intent": "test_intent", "limit": 10, "offset": 0}
-    )
+
     mock_response = [{"name": "string", "description": "string"}]
 
     route = respx.get(f"{BASE_URL}functions/search").mock(
         return_value=httpx.Response(200, json=mock_response)
     )
 
-    functions = client.search_functions(params)
+    functions = client.search_functions(app_names=["TEST"], intent="test", limit=10, offset=0)
     assert [function.model_dump() for function in functions] == mock_response
     assert route.call_count == 1, "should not retry"
 
@@ -326,15 +322,14 @@ def test_execute_function_retry_exhausted() -> None:
 @respx.mock
 def test_handle_function_call_search_apps() -> None:
     client = create_test_client()
-    function_name = AipolabsSearchApps.NAME
-    function_parameters = {"query": "test"}
+
     mock_response = [{"name": "Test App", "description": "Test Description"}]
 
     route = respx.get(f"{BASE_URL}apps/search").mock(
         return_value=httpx.Response(200, json=mock_response)
     )
 
-    response = client.handle_function_call(function_name, function_parameters)
+    response = client.handle_function_call(AipolabsSearchApps.NAME, {"intent": "search apps"})
     assert response == mock_response
     assert route.call_count == 1, "should not retry"
 
@@ -342,15 +337,16 @@ def test_handle_function_call_search_apps() -> None:
 @respx.mock
 def test_handle_function_call_search_functions() -> None:
     client = create_test_client()
-    function_name = AipolabsSearchFunctions.NAME
-    function_parameters = {"query": "test"}
     mock_response = [{"name": "Test Function", "description": "Test Description"}]
 
     route = respx.get(f"{BASE_URL}functions/search").mock(
         return_value=httpx.Response(200, json=mock_response)
     )
 
-    response = client.handle_function_call(function_name, function_parameters)
+    response = client.handle_function_call(
+        AipolabsSearchFunctions.NAME,
+        {"app_names": ["TEST"], "intent": "search functions"},
+    )
     assert response == mock_response
     assert route.call_count == 1, "should not retry"
 
@@ -373,23 +369,27 @@ def test_handle_function_call_get_function_definition() -> None:
 
 
 @respx.mock
-def test_handle_function_call_execute_function() -> None:
+def test_handle_function_call_meta_function_execution() -> None:
     client = create_test_client()
-    function_name = AipolabsExecuteFunction.NAME
-    function_parameters = {"function_name": "TEST_FUNCTION", "function_input": {"param1": "value1"}}
+
+    function_parameters = {
+        "function_name": "BRAVE_SEARCH__WEB_SEARCH",
+        "function_parameters": {"param1": "value1"},
+    }
     mock_response = {"success": True, "data": "string"}
+
     # note: the functio name for mock route here should be function_name in the function_parameters
     route = respx.post(f"{BASE_URL}functions/{function_parameters['function_name']}/execute").mock(
         return_value=httpx.Response(200, json=mock_response)
     )
 
-    response = client.handle_function_call(function_name, function_parameters)
+    response = client.handle_function_call(AipolabsExecuteFunction.NAME, function_parameters)
     assert response == mock_response
     assert route.call_count == 1, "should not retry"
 
 
 @respx.mock
-def test_handle_function_call_execute_indexed_execution() -> None:
+def test_handle_function_call_direct_indexed_function_execution() -> None:
     client = create_test_client()
     function_name = "BRAVE_SEARCH__WEB_SEARCH"
     function_parameters = {"query": "test"}
