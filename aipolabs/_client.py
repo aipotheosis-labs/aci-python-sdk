@@ -5,65 +5,19 @@ import os
 from typing import Any
 
 import httpx
-from tenacity import (
-    after_log,
-    before_log,
-    retry,
-    retry_if_exception_type,
-    stop_after_attempt,
-    wait_exponential,
-)
 
-from aipolabs._constants import (
-    DEFAULT_AIPOLABS_BASE_URL,
-    DEFAULT_MAX_RETRIES,
-    DEFAULT_RETRY_MAX_WAIT,
-    DEFAULT_RETRY_MIN_WAIT,
-    DEFAULT_RETRY_MULTIPLIER,
-)
-from aipolabs._exceptions import (
-    APIKeyNotFound,
-    AuthenticationError,
-    NotFoundError,
-    PermissionError,
-    RateLimitError,
-    ServerError,
-    UnknownError,
-    ValidationError,
-)
+from aipolabs._constants import DEFAULT_AIPOLABS_BASE_URL
+from aipolabs._exceptions import APIKeyNotFound
 from aipolabs.meta_functions import (
     AipolabsExecuteFunction,
     AipolabsGetFunctionDefinition,
     AipolabsSearchApps,
     AipolabsSearchFunctions,
 )
-from aipolabs.utils._logging import SensitiveHeadersFilter
+from aipolabs.resource.apps import AppsResource
+from aipolabs.resource.functions import FunctionsResource
 
 logger: logging.Logger = logging.getLogger(__name__)
-logger.addFilter(SensitiveHeadersFilter())
-
-
-# Shared retry config for all requests to the Aipolabs API
-retry_config = {
-    "stop": stop_after_attempt(DEFAULT_MAX_RETRIES),
-    "wait": wait_exponential(
-        multiplier=DEFAULT_RETRY_MULTIPLIER,
-        min=DEFAULT_RETRY_MIN_WAIT,
-        max=DEFAULT_RETRY_MAX_WAIT,
-    ),
-    "retry": retry_if_exception_type(
-        (
-            ServerError,
-            RateLimitError,
-            UnknownError,
-            httpx.TimeoutException,
-            httpx.NetworkError,
-        )
-    ),
-    "before": before_log(logger, logging.DEBUG),
-    "after": after_log(logger, logging.DEBUG),
-    "reraise": True,
-}
 
 
 class Aipolabs:
@@ -108,7 +62,11 @@ class Aipolabs:
             "Content-Type": "application/json",
             "x-api-key": api_key,
         }
-        self.client = httpx.Client(base_url=self.base_url, headers=self.headers)
+        self.httpx_client = httpx.Client(base_url=self.base_url, headers=self.headers)
+
+        # Initialize resource clients
+        self.apps = AppsResource(self.httpx_client)
+        self.functions = FunctionsResource(self.httpx_client, self.inference_provider)
 
     def handle_function_call(self, function_name: str, function_parameters: dict) -> Any:
         """Routes and executes function calls based on the function name.
@@ -129,19 +87,17 @@ class Aipolabs:
             f"Handling function call with name: {function_name} and params: {function_parameters}"
         )
         if function_name == AipolabsSearchApps.NAME:
-            apps = self.search_apps(**function_parameters)
+            apps = self.apps.search(**function_parameters)
 
             return [app.model_dump() for app in apps]
 
         elif function_name == AipolabsSearchFunctions.NAME:
-            functions = self.search_functions(**function_parameters)
+            functions = self.functions.search(**function_parameters)
 
             return [function.model_dump() for function in functions]
 
         elif function_name == AipolabsGetFunctionDefinition.NAME:
-            function_definition: dict = self.get_function_definition(**function_parameters)
-
-            return function_definition
+            return self.functions.get(**function_parameters)
 
         elif function_name == AipolabsExecuteFunction.NAME:
             # TODO: sometimes when using the fixed_tool approach llm most time doesn't put input parameters in the
@@ -151,157 +107,15 @@ class Aipolabs:
             function_parameters = AipolabsExecuteFunction.wrap_function_parameters_if_not_present(
                 function_parameters
             )
-
-            function_execution_result = self.execute_function(**function_parameters)
-
-            return function_execution_result.model_dump(exclude_none=True)
+            result = self.functions.execute(**function_parameters)
+            return result.model_dump(exclude_none=True)
 
         else:
             # If the function name is not a meta function, we assume it is a direct function execution of
             # an aipolabs indexed function
             # TODO: check function exist if not throw excpetion?
-            function_execution_result = self.execute_function(function_name, function_parameters)
-
-            return function_execution_result.model_dump(exclude_none=True)
-
-    @retry(**retry_config)
-    def search_apps(
-        self, intent: str | None = None, limit: int | None = None, offset: int | None = None
-    ) -> list[AipolabsSearchApps.App]:
-        """Searches for apps using the provided parameters.
-
-        Args:
-            intent: search results will be sorted by relevance to this intent.
-            limit: for pagination, maximum number of apps to return.
-            offset: for pagination, number of apps to skip before returning results.
-
-        Returns:
-            list[AipolabsSearchApps.App]: List of apps matching the search criteria in the order of relevance.
-
-        Raises:
-            Various exceptions defined in _handle_response for different HTTP status codes.
-        """
-        validated_params = AipolabsSearchApps.SearchAppsParams(
-            intent=intent, limit=limit, offset=offset
-        ).model_dump(exclude_none=True)
-
-        logger.info(f"Searching apps with params: {validated_params}")
-        response = self.client.get(
-            "apps/search",
-            params=validated_params,
-        )
-
-        data: list[dict] = self._handle_response(response)
-        apps = [AipolabsSearchApps.App.model_validate(app) for app in data]
-
-        return apps
-
-    @retry(**retry_config)
-    def search_functions(
-        self,
-        app_names: list[str] | None = None,
-        intent: str | None = None,
-        limit: int | None = None,
-        offset: int | None = None,
-    ) -> list[AipolabsSearchFunctions.Function]:
-        """Searches for functions using the provided parameters.
-
-        Args:
-            app_names: List of app names to filter functions by.
-            intent: search results will be sorted by relevance to this intent.
-            limit: for pagination, maximum number of functions to return.
-            offset: for pagination, number of functions to skip before returning results.
-
-        Returns:
-            list[AipolabsSearchFunctions.Function]: List of functions matching the search criteria in the order of relevance.
-
-        Raises:
-            Various exceptions defined in _handle_response for different HTTP status codes.
-        """
-        validated_params = AipolabsSearchFunctions.SearchFunctionsParams(
-            app_names=app_names, intent=intent, limit=limit, offset=offset
-        ).model_dump(exclude_none=True)
-
-        logger.info(f"Searching functions with params: {validated_params}")
-
-        response = self.client.get(
-            "functions/search",
-            params=validated_params,
-        )
-
-        data: list[dict] = self._handle_response(response)
-        functions = [AipolabsSearchFunctions.Function.model_validate(function) for function in data]
-
-        return functions
-
-    @retry(**retry_config)
-    def get_function_definition(self, function_name: str) -> dict:
-        """Retrieves the definition of a specific function.
-
-        Args:
-            function_name: Name of the function to retrieve.
-
-        Returns:
-            dict: JSON schema that defines the function, varies based on the inference provider.
-
-        Raises:
-            Various exceptions defined in _handle_response for different HTTP status codes.
-        """
-        validated_params = AipolabsGetFunctionDefinition.GetFunctionDefinitionParams(
-            function_name=function_name, inference_provider=self.inference_provider
-        )
-
-        logger.info(
-            f"Getting function definition of {validated_params.function_name}, "
-            f"format: {validated_params.inference_provider}"
-        )
-        response = self.client.get(
-            f"functions/{validated_params.function_name}",
-            params={"inference_provider": validated_params.inference_provider},
-        )
-
-        function_definition: dict = self._handle_response(response)
-
-        return function_definition
-
-    @retry(**retry_config)
-    def execute_function(
-        self, function_name: str, function_parameters: dict
-    ) -> AipolabsExecuteFunction.FunctionExecutionResult:
-        """Executes a Aipolabs indexed function with the provided parameters.
-
-        Args:
-            function_name: Name of the function to execute.
-            function_parameters: Dictionary containing the input parameters for the function.
-
-        Returns:
-            AipolabsExecuteFunction.FunctionExecutionResult: containing the function execution results.
-
-        Raises:
-            Various exceptions defined in _handle_response for different HTTP status codes.
-        """
-        validated_params = AipolabsExecuteFunction.FunctionExecutionParams(
-            function_name=function_name, function_parameters=function_parameters
-        )
-
-        logger.info(
-            f"Executing function with name: {validated_params.function_name} and params: {validated_params.function_parameters}"
-        )
-        request_body = {
-            "function_input": validated_params.function_parameters,
-        }
-        response = self.client.post(
-            f"functions/{validated_params.function_name}/execute",
-            json=request_body,
-        )
-
-        function_execution_result: AipolabsExecuteFunction.FunctionExecutionResult = (
-            AipolabsExecuteFunction.FunctionExecutionResult.model_validate(
-                self._handle_response(response)
-            )
-        )
-
-        return function_execution_result
+            result = self.functions.execute(function_name, function_parameters)
+            return result.model_dump(exclude_none=True)
 
     def _enforce_trailing_slash(self, url: httpx.URL) -> httpx.URL:
         """Ensures the URL ends with a trailing slash.
@@ -315,67 +129,3 @@ class Aipolabs:
         if url.raw_path.endswith(b"/"):
             return url
         return url.copy_with(raw_path=url.raw_path + b"/")
-
-    def _handle_response(self, response: httpx.Response) -> Any:
-        """Processes API responses and handles errors.
-
-        Args:
-            response: The HTTP response from the API.
-
-        Returns:
-            Any: Parsed JSON response for successful requests.
-
-        Raises:
-            AuthenticationError: For 401 status codes.
-            PermissionError: For 403 status codes.
-            NotFoundError: For 404 status codes.
-            ValidationError: For 400 status codes.
-            RateLimitError: For 429 status codes.
-            ServerError: For 5xx status codes.
-            UnknownError: For unexpected status codes.
-        """
-
-        try:
-            response.raise_for_status()
-            return self._get_response_data(response)
-
-        except httpx.HTTPStatusError as e:
-            error_message = self._get_error_message(response, e)
-
-            # TODO: cross-check with backend
-            if response.status_code == 401:
-                raise AuthenticationError(error_message)
-            elif response.status_code == 403:
-                raise PermissionError(error_message)
-            elif response.status_code == 404:
-                raise NotFoundError(error_message)
-            elif response.status_code == 400:
-                raise ValidationError(error_message)
-            elif response.status_code == 429:
-                raise RateLimitError(error_message)
-            elif 500 <= response.status_code < 600:
-                raise ServerError(error_message)
-            else:
-                raise UnknownError(error_message)
-
-    def _get_response_data(self, response: httpx.Response) -> Any:
-        """Get the response data from the response.
-        If the response is json, return the json data, otherwise fallback to the text.
-        TODO: handle non-json response?
-        """
-        try:
-            response_data = response.json() if response.content else {}
-        except Exception as e:
-            logger.warning(f"error parsing json response: {str(e)}")
-            response_data = response.text
-
-        return response_data
-
-    def _get_error_message(self, response: httpx.Response, error: httpx.HTTPStatusError) -> str:
-        """Get the error message from the response or fallback to the error message from the HTTPStatusError.
-        Usually the response json contains more details about the error.
-        """
-        try:
-            return str(response.json())
-        except Exception:
-            return str(error)

@@ -15,9 +15,7 @@ aipolabs = Aipolabs()
 
 
 def main() -> None:
-    brave_search_function_definition = aipolabs.get_function_definition(
-        Function.BRAVE_SEARCH__WEB_SEARCH
-    )
+    brave_search_function_definition = aipolabs.functions.get(Function.BRAVE_SEARCH__WEB_SEARCH)
 
     print(create_headline("Brave search function definition"))
     print(brave_search_function_definition)
@@ -47,7 +45,7 @@ def main() -> None:
         print(create_headline(f"Tool call: {tool_call.function.name}"))
         print(f"arguments: {tool_call.function.arguments}")
         # submit the selected function and its arguments to aipolabs backend for execution
-        result = aipolabs.execute_function(
+        result = aipolabs.functions.execute(
             tool_call.function.name, json.loads(tool_call.function.arguments)
         )
         print(create_headline("Function execution result"))

@@ -20,6 +20,8 @@ def setup_logging() -> None:
         datefmt="%Y-%m-%d %H:%M:%S",
     )
     httpx_logger.setLevel(logging.WARN)
+    # TODO: avoid logging any sensitive headers
+    logger.addFilter(SensitiveHeadersFilter())
 
     if AIPOLABS_LOG_LEVEL == "debug":
         logger.setLevel(logging.DEBUG)
