@@ -29,11 +29,13 @@ Aipolabs platform is built with agent-first principles. Although you can call ea
 from aipolabs import Aipolabs
 
 client = Aipolabs(
-    # it reads from environment variable by default so you can omit it
+    # it reads from environment variable by default so you can omit it if you set it in your environment
     api_key=os.environ.get("AIPOLABS_API_KEY")
 )
 ```
 
-### Search Apps
+### Apps
+
+#### Search
 
 ```python

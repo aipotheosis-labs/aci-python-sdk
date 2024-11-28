@@ -8,8 +8,6 @@ The function requires one key parameter:
 It returns json schema of the function definition.
 """
 
-from pydantic import BaseModel
-
 NAME = "AIPOLABS_GET_FUNCTION_DEFINITION"
 
 SCHEMA = {
@@ -30,14 +28,3 @@ SCHEMA = {
         },
     },
 }
-
-
-class GetFunctionDefinitionParams(BaseModel):
-    """Parameters for getting a function definition.
-
-    The backend require "inference_provider" parameter but this value should be set by
-    developer not LLM when using the sdk, so inference_provider parameter is not present in SCHEMA above.
-    """
-
-    function_name: str
-    inference_provider: str | None

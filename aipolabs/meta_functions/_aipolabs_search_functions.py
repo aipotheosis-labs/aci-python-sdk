@@ -5,8 +5,6 @@ relevant executable functions that can help complete a task.
 You can filter by adding app names, which can be retrieved using the AIPOLABS_SEARCH_APPS meta function.
 """
 
-from pydantic import BaseModel
-
 NAME = "AIPOLABS_SEARCH_FUNCTIONS"
 SCHEMA = {
     "type": "function",
@@ -45,25 +43,3 @@ SCHEMA = {
         },
     },
 }
-
-
-class SearchFunctionsParams(BaseModel):
-    """Parameters for searching functions.
-
-    Parameters should be identical to the ones on the server side.
-    """
-
-    app_names: list[str] | None = None
-    intent: str | None = None
-    limit: int | None = None
-    offset: int | None = None
-
-
-class Function(BaseModel):
-    """Representation of a function. Search results will return a list of these.
-
-    Should match the schema defined on the server side.
-    """
-
-    name: str
-    description: str

@@ -3,12 +3,14 @@ import logging
 import httpx
 from tenacity import retry
 
-from aipolabs.meta_functions import (
-    AipolabsExecuteFunction,
-    AipolabsGetFunctionDefinition,
-    AipolabsSearchFunctions,
-)
 from aipolabs.resource._base import APIResource, retry_config
+from aipolabs.types._functions import (
+    Function,
+    FunctionExecutionParams,
+    FunctionExecutionResult,
+    GetFunctionDefinitionParams,
+    SearchFunctionsParams,
+)
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -25,7 +27,7 @@ class FunctionsResource(APIResource):
         intent: str | None = None,
         limit: int | None = None,
         offset: int | None = None,
-    ) -> list[AipolabsSearchFunctions.Function]:
+    ) -> list[Function]:
         """Searches for functions using the provided parameters.
 
         Args:
@@ -35,12 +37,12 @@ class FunctionsResource(APIResource):
             offset: for pagination, number of functions to skip before returning results.
 
         Returns:
-            list[AipolabsSearchFunctions.Function]: List of functions matching the search criteria in the order of relevance.
+            list[Function]: List of functions matching the search criteria in the order of relevance.
 
         Raises:
             Various exceptions defined in _handle_response for different HTTP status codes.
         """
-        validated_params = AipolabsSearchFunctions.SearchFunctionsParams(
+        validated_params = SearchFunctionsParams(
             app_names=app_names, intent=intent, limit=limit, offset=offset
         ).model_dump(exclude_none=True)
 
@@ -51,7 +53,7 @@ class FunctionsResource(APIResource):
         )
 
         data: list[dict] = self._handle_response(response)
-        functions = [AipolabsSearchFunctions.Function.model_validate(function) for function in data]
+        functions = [Function.model_validate(function) for function in data]
 
         return functions
 
@@ -68,7 +70,7 @@ class FunctionsResource(APIResource):
         Raises:
             Various exceptions defined in _handle_response for different HTTP status codes.
         """
-        validated_params = AipolabsGetFunctionDefinition.GetFunctionDefinitionParams(
+        validated_params = GetFunctionDefinitionParams(
             function_name=function_name, inference_provider=self._inference_provider
         )
 
@@ -86,9 +88,7 @@ class FunctionsResource(APIResource):
         return function_definition
 
     @retry(**retry_config)
-    def execute(
-        self, function_name: str, function_parameters: dict
-    ) -> AipolabsExecuteFunction.FunctionExecutionResult:
+    def execute(self, function_name: str, function_parameters: dict) -> FunctionExecutionResult:
         """Executes a Aipolabs indexed function with the provided parameters.
 
         Args:
@@ -96,12 +96,12 @@ class FunctionsResource(APIResource):
             function_parameters: Dictionary containing the input parameters for the function.
 
         Returns:
-            AipolabsExecuteFunction.FunctionExecutionResult: containing the function execution results.
+            FunctionExecutionResult: containing the function execution results.
 
         Raises:
             Various exceptions defined in _handle_response for different HTTP status codes.
         """
-        validated_params = AipolabsExecuteFunction.FunctionExecutionParams(
+        validated_params = FunctionExecutionParams(
             function_name=function_name, function_parameters=function_parameters
         )
 
@@ -116,10 +116,8 @@ class FunctionsResource(APIResource):
             json=request_body,
         )
 
-        function_execution_result: AipolabsExecuteFunction.FunctionExecutionResult = (
-            AipolabsExecuteFunction.FunctionExecutionResult.model_validate(
-                self._handle_response(response)
-            )
+        function_execution_result: FunctionExecutionResult = FunctionExecutionResult.model_validate(
+            self._handle_response(response)
         )
 
         return function_execution_result

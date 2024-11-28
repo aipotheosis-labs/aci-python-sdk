@@ -6,10 +6,6 @@ This module includes the schema definition for the function and a Pydantic model
 validating the execution parameters.
 """
 
-from typing import Any
-
-from pydantic import BaseModel
-
 import aipolabs.meta_functions._aipolabs_get_function_definition as AipolabsGetFunctionDefinition
 
 NAME = "AIPOLABS_EXECUTE_FUNCTION"
@@ -36,31 +32,6 @@ SCHEMA = {
         },
     },
 }
-
-
-class FunctionExecutionParams(BaseModel):
-    """Parameters for executing a function.
-
-    The function requires two key parameters:
-    1. function_name: The name of the function to execute, which is the function name of the function that is
-    retrieved using the AIPOLABS_GET_FUNCTION_DEFINITION meta function.
-    2. function_parameters: A dictionary containing all input parameters required to execute
-    the specified function. These parameters are also provided by the function definition
-    retrieved using the AIPOLABS_GET_FUNCTION_DEFINITION meta function. If a function does not require parameters, an empty dictionary should be provided.
-    """
-
-    function_name: str
-    function_parameters: dict
-
-
-class FunctionExecutionResult(BaseModel):
-    """Result of a Aipolabs indexed function (e.g. BRAVE_SEARCH__WEB_SEARCH) execution.
-    Should be identical to the class defined on server side.
-    """
-
-    success: bool
-    data: Any | None = None
-    error: str | None = None
 
 
 def wrap_function_parameters_if_not_present(obj: dict) -> dict:
