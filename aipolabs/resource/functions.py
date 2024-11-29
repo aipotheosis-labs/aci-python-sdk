@@ -65,6 +65,7 @@ class FunctionsResource(APIResource):
             function_name: Name of the function to retrieve.
 
         Returns:
+            # TODO: specific pydantic model for returned function definition based on inference provider
             dict: JSON schema that defines the function, varies based on the inference provider.
 
         Raises:

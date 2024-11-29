@@ -2,6 +2,8 @@ from typing import ClassVar
 
 from pydantic import BaseModel
 
+from aipolabs.types.functions import Function
+
 
 class SearchAppsParams(BaseModel):
     """Parameters for filtering applications.
@@ -33,3 +35,11 @@ class App(BaseModel):
 
     # Class-level constants for supported apps
     BRAVE_SEARCH__WEB_SEARCH: ClassVar[str] = "BRAVE_SEARCH__WEB_SEARCH"
+
+
+class AppDetails(App):
+    """Detailed representation of an application, returned by App.get().
+    Includes all base App fields plus functions supported by the app.
+    """
+
+    functions: list[Function]

@@ -3,7 +3,7 @@ import logging
 from tenacity import retry
 
 from aipolabs.resource._base import APIResource, retry_config
-from aipolabs.types.apps import App, SearchAppsParams
+from aipolabs.types.apps import App, AppDetails, SearchAppsParams
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -41,3 +41,11 @@ class AppsResource(APIResource):
         apps = [App.model_validate(app) for app in data]
 
         return apps
+
+    @retry(**retry_config)
+    def get(self, app_name: str) -> AppDetails:
+        """Gets detailed information about an app."""
+        response = self._httpx_client.get(f"apps/{app_name}")
+        data: dict = self._handle_response(response)
+        app_details: AppDetails = AppDetails.model_validate(data)
+        return app_details

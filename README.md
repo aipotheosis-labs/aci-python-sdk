@@ -35,8 +35,29 @@ client = Aipolabs(
 ```
 
 ### Apps
+Types
+```python
+from aipolabs.types.apps import App
+```
+
+Methods
+```python
+# search for apps, returns list of apps sorted by relevance to the intent
+apps: list[App] = client.apps.search(intent="I want to search the web", limit=10, offset=0)
+```
 
 #### Search
 
-```python
+### Functions
 
+#### Types
+#### Search
+#### Get FunctionDefinition
+#### Execute
+
+
+### Agent-centric features
+
+#### Meta Functions
+
+#### Unified Function Calling Handler

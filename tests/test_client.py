@@ -64,6 +64,24 @@ def test_search_apps_success() -> None:
 
 
 @respx.mock
+def test_get_app_success() -> None:
+    client = create_test_client()
+    app_name = "TEST_APP"
+    mock_response = {
+        "name": "Test App",
+        "description": "Test Description",
+        "functions": [{"name": "Test Function", "description": "Test Description"}],
+    }
+    route = respx.get(f"{BASE_URL}apps/{app_name}").mock(
+        return_value=httpx.Response(200, json=mock_response)
+    )
+
+    app = client.apps.get(app_name)
+    assert app.model_dump() == mock_response
+    assert route.call_count == 1, "should not retry"
+
+
+@respx.mock
 def test_search_functions_success() -> None:
     client = create_test_client()
     mock_response = [{"name": "string", "description": "string"}]
