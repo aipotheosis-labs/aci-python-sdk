@@ -4,7 +4,7 @@ import httpx
 from tenacity import retry
 
 from aipolabs.resource._base import APIResource, retry_config
-from aipolabs.types._functions import (
+from aipolabs.types.functions import (
     Function,
     FunctionExecutionParams,
     FunctionExecutionResult,

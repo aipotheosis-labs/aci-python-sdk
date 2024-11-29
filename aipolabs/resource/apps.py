@@ -3,7 +3,7 @@ import logging
 from tenacity import retry
 
 from aipolabs.resource._base import APIResource, retry_config
-from aipolabs.types._apps import App, SearchAppsParams
+from aipolabs.types.apps import App, SearchAppsParams
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ class AppsResource(APIResource):
             offset: for pagination, number of apps to skip before returning results.
 
         Returns:
-            list[AipolabsSearchApps.App]: List of apps matching the search criteria in the order of relevance.
+            list[App]: List of apps matching the search criteria in the order of relevance.
 
         Raises:
             Various exceptions defined in _handle_response for different HTTP status codes.

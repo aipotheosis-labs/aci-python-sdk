@@ -3,7 +3,8 @@ import json
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from aipolabs import Aipolabs, Function
+from aipolabs import Aipolabs
+from aipolabs.types.functions import Function
 from aipolabs.utils._logging import create_headline
 
 load_dotenv()
