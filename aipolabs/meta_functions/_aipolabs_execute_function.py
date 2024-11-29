@@ -23,7 +23,7 @@ SCHEMA = {
                 },
                 "function_parameters": {
                     "type": "object",
-                    "description": "This object contains the all input parameters in key-value pairs needed to execute the specified function. The required parameters depend on the 'function_name' and are provided in the function definition retrieved. For functions without parameters, provide an empty object",
+                    "description": "A dictionary containing key-value pairs of input parameters required by the specified function. The parameter names and types must match those defined in the function definition previously retrieved. If the function requires no parameters, provide an empty object.",
                     "additionalProperties": True,
                 },
             },
