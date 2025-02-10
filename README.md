@@ -44,7 +44,13 @@ from aipolabs.types.apps import App, AppDetails
 ```python
 # search for apps, returns list of basic app data, sorted by relevance to the intent
 # all parameters are optional
-apps: list[App] = client.apps.search(intent="I want to search the web", limit=10, offset=0)
+apps: list[App] = client.apps.search(
+    intent="I want to search the web",
+    configured_only=True,
+    categories=["search"],
+    limit=10,
+    offset=0
+)
 ```
 
 ```python

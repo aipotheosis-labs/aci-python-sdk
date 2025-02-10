@@ -10,10 +10,11 @@ class SearchAppsParams(BaseModel):
 
     Parameters should be identical to the ones on the server side.
 
-    TODO: Add categories field.
     """
 
     intent: str | None = None
+    configured_only: bool = False
+    categories: list[str] | None = None
     limit: int | None = None
     offset: int | None = None
 
@@ -34,6 +35,7 @@ class App(BaseModel):
     description: str
 
     # Class-level constants for supported apps
+    # TODO: add all supported apps
     BRAVE_SEARCH__WEB_SEARCH: ClassVar[str] = "BRAVE_SEARCH__WEB_SEARCH"
 
 
