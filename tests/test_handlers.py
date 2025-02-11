@@ -116,3 +116,37 @@ def test_handle_function_call_throws_error_for_function_execution_without_linked
 ) -> None:
     with pytest.raises(MissingLinkedAccountOwnerId):
         client.handle_function_call(function_name, function_parameters)
+
+
+@respx.mock
+@pytest.mark.parametrize(
+    "function_name, function_parameters",
+    [
+        (
+            AipolabsExecuteFunction.NAME,
+            {
+                "function_name": "BRAVE_SEARCH__WEB_SEARCH",
+                "function_parameters": {"param1": "value1"},
+            },
+        ),
+        ("BRAVE_SEARCH__WEB_SEARCH", {"query": "test"}),
+    ],
+)
+def test_handle_function_call_Linked_account_owner_id_set_in_client(
+    client: Aipolabs, function_name: str, function_parameters: dict
+) -> None:
+    mock_response = {"success": True, "data": "string"}
+    if function_name == AipolabsExecuteFunction.NAME:
+        route = respx.post(
+            f"{BASE_URL}functions/{function_parameters['function_name']}/execute"
+        ).mock(return_value=httpx.Response(200, json=mock_response))
+
+    else:
+        route = respx.post(f"{BASE_URL}functions/{function_name}/execute").mock(
+            return_value=httpx.Response(200, json=mock_response)
+        )
+    # set the linked_account_owner_id in the client
+    client.linked_account_owner_id = "test"
+    response = client.handle_function_call(function_name, function_parameters)
+    assert response == mock_response
+    assert route.call_count == 1, "should not retry"
