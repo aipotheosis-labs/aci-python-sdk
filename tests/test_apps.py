@@ -4,7 +4,7 @@ import respx
 
 from aipolabs import Aipolabs
 
-from .utils import BASE_URL
+from .utils import MOCK_BASE_URL
 
 
 @respx.mock
@@ -24,7 +24,7 @@ from .utils import BASE_URL
 def test_search_apps_success(client: Aipolabs, search_params: dict) -> None:
     mock_response = [{"name": "Test App", "description": "Test Description"}]
 
-    route = respx.get(f"{BASE_URL}apps/search").mock(
+    route = respx.get(f"{MOCK_BASE_URL}apps/search").mock(
         return_value=httpx.Response(200, json=mock_response)
     )
 
@@ -41,7 +41,7 @@ def test_get_app_success(client: Aipolabs) -> None:
         "description": "Test Description",
         "functions": [{"name": "Test Function", "description": "Test Description"}],
     }
-    route = respx.get(f"{BASE_URL}apps/{app_name}").mock(
+    route = respx.get(f"{MOCK_BASE_URL}apps/{app_name}").mock(
         return_value=httpx.Response(200, json=mock_response)
     )
 
