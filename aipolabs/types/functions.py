@@ -23,10 +23,13 @@ class FunctionExecutionParams(BaseModel):
     2. function_parameters: A dictionary containing all input parameters required to execute
     the specified function. These parameters are also provided by the function definition
     retrieved using the AIPOLABS_GET_FUNCTION_DEFINITION meta function. If a function does not require parameters, an empty dictionary should be provided.
+    3. linked_account_owner_id: to specify with credentials of which linked account the
+    function should be executed.
     """
 
     function_name: str
     function_parameters: dict
+    linked_account_owner_id: str
 
 
 class FunctionExecutionResult(BaseModel):
