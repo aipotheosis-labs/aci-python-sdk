@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Any
+from types import TracebackType
+from typing import Any, Optional, Type
 
 import httpx
 
@@ -68,6 +69,18 @@ class Aipolabs:
         self.apps = AppsResource(self.httpx_client)
         self.functions = FunctionsResource(self.httpx_client, self.inference_provider)
 
+    def __enter__(self) -> Aipolabs:
+        self.httpx_client.__enter__()
+        return self
+
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
+        self.httpx_client.__exit__(exc_type, exc_val, exc_tb)
+
     def handle_function_call(self, function_name: str, function_parameters: dict) -> Any:
         """Routes and executes function calls based on the function name.
         This can be a convenience function to handle function calls from LLM without you checking the function name.
@@ -97,7 +110,7 @@ class Aipolabs:
             return [function.model_dump() for function in functions]
 
         elif function_name == AipolabsGetFunctionDefinition.NAME:
-            return self.functions.get(**function_parameters)
+            return self.functions.get_definition(**function_parameters)
 
         elif function_name == AipolabsExecuteFunction.NAME:
             # TODO: sometimes when using the fixed_tool approach llm most time doesn't put input parameters in the

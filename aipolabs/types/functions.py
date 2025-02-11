@@ -7,7 +7,7 @@ class GetFunctionDefinitionParams(BaseModel):
     """Parameters for getting a function definition.
 
     The backend require "inference_provider" parameter but this value should be set by
-    developer not LLM when using the sdk, so inference_provider parameter is not present in SCHEMA above.
+    developer not LLM when using the sdk, so inference_provider parameter is not present in meta SCHEMA.
     """
 
     function_name: str
@@ -47,6 +47,7 @@ class SearchFunctionsParams(BaseModel):
 
     app_names: list[str] | None = None
     intent: str | None = None
+    configured_only: bool = False
     limit: int | None = None
     offset: int | None = None
 
