@@ -12,7 +12,7 @@ load_dotenv()
 # gets OPENAI_API_KEY from your environment variables
 openai = OpenAI()
 # gets AIPOLABS_API_KEY from your environment variables
-aipolabs = Aipolabs(linked_account_owner_id="change_this_to_your_linked_account_owner_id")
+aipolabs = Aipolabs()
 
 
 def main() -> None:
@@ -49,11 +49,15 @@ def main() -> None:
         print(f"arguments: {tool_call.function.arguments}")
         # submit the selected function and its arguments to aipolabs backend for execution
         result = aipolabs.handle_function_call(
-            tool_call.function.name, json.loads(tool_call.function.arguments)
+            tool_call.function.name,
+            json.loads(tool_call.function.arguments),
+            linked_account_owner_id="change_this_to_your_linked_account_owner_id",
         )
         # alternatively, because this is a direct function execution you can use the following:
         # result = aipolabs.functions.execute(
-        #     tool_call.function.name, json.loads(tool_call.function.arguments)
+        #     tool_call.function.name,
+        #     json.loads(tool_call.function.arguments),
+        #     linked_account_owner_id="change_this_to_your_linked_account_owner_id",
         # )
         print(f"{create_headline('Function Call Result')} \n {result}")
 

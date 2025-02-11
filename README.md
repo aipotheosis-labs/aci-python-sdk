@@ -30,11 +30,7 @@ from aipolabs import Aipolabs
 
 client = Aipolabs(
     # it reads from environment variable by default so you can omit it if you set it in your environment
-    api_key=os.environ.get("AIPOLABS_API_KEY"),
-    # Optional (alternatively you can provide it on function level).
-    # This is to specify the end-user (account owner) on behalf of whom you want to execute functions
-    # You need to first link corresponding account with the same owner id in the Aipolabs dashboard.
-    linked_account_owner_id="john_doe"
+    api_key=os.environ.get("AIPOLABS_API_KEY")
 )
 ```
 

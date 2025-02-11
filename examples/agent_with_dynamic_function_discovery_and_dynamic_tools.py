@@ -11,7 +11,7 @@ load_dotenv()
 # gets OPENAI_API_KEY from your environment variables
 openai = OpenAI()
 # gets AIPOLABS_API_KEY from your environment variables
-aipolabs = Aipolabs(linked_account_owner_id="change_this_to_your_linked_account_owner_id")
+aipolabs = Aipolabs()
 
 prompt = (
     "You are a helpful assistant with access to a unlimited number of tools via three meta functions: "
@@ -76,7 +76,9 @@ def main() -> None:
 
             chat_history.append({"role": "assistant", "tool_calls": [tool_call]})
             result = aipolabs.handle_function_call(
-                tool_call.function.name, json.loads(tool_call.function.arguments)
+                tool_call.function.name,
+                json.loads(tool_call.function.arguments),
+                linked_account_owner_id="change_this_to_your_linked_account_owner_id",
             )
             # if the function call is a get, add the retrieved function definition to the tools_retrieved
             if tool_call.function.name == meta_functions.AipolabsGetFunctionDefinition.NAME:

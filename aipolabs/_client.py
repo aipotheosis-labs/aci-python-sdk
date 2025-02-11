@@ -8,7 +8,7 @@ from typing import Any, Optional, Type
 import httpx
 
 from aipolabs._constants import DEFAULT_AIPOLABS_BASE_URL
-from aipolabs._exceptions import APIKeyNotFound, MissingLinkedAccountOwnerId
+from aipolabs._exceptions import APIKeyNotFound
 from aipolabs.meta_functions import (
     AipolabsExecuteFunction,
     AipolabsGetFunctionDefinition,
@@ -31,7 +31,6 @@ class Aipolabs:
     Attributes:
         api_key (str): The API key used for authentication.
         base_url (str | httpx.URL): The base URL for API requests.
-        linked_account_owner_id (str): Specify the end-user (account owner) on behalf of whom you want to execute the function.
         inference_provider (str): The inference provider (currently only 'openai').
         headers (dict): HTTP headers used in requests.
         client (httpx.Client): The HTTP client for making requests.
@@ -42,14 +41,12 @@ class Aipolabs:
         *,
         api_key: str | None = None,
         base_url: str | httpx.URL | None = None,
-        linked_account_owner_id: str | None = None,
     ) -> None:
         """Create and initialize a new Aipolabs client.
 
         Args:
             api_key: The API key to use for authentication.
             base_url: The base URL to use for the API requests.
-            linked_account_owner_id: Specify the end-user (account owner) on behalf of whom you want to execute the function.
             If values are not provided it will try to read from the corresponding environment variables.
             If no value found for api_key, it will raise APIKeyNotFound.
             If no value found for base_url, it will use the default value.
@@ -63,7 +60,6 @@ class Aipolabs:
         if base_url is None:
             base_url = os.environ.get("AIPOLABS_BASE_URL", DEFAULT_AIPOLABS_BASE_URL)
         self.base_url = self._enforce_trailing_slash(httpx.URL(base_url))
-        self.linked_account_owner_id = linked_account_owner_id
         # TODO: currently only openai is supported
         self.inference_provider = "openai"
         self.headers = {
@@ -92,7 +88,7 @@ class Aipolabs:
         self,
         function_name: str,
         function_parameters: dict,
-        linked_account_owner_id: str | None = None,
+        linked_account_owner_id: str,
     ) -> Any:
         """Routes and executes function calls based on the function name.
         This can be a convenience function to handle function calls from LLM without you checking the function name.
@@ -104,11 +100,11 @@ class Aipolabs:
         Args:
             function_name: Name of the function to be called.
             function_parameters: Dictionary containing the parameters for the function.
-            linked_account_owner_id: Method level override for linked_account_owner_id.
+            linked_account_owner_id: To specify the end-user (account owner) on behalf of whom you want to execute functions
+            You need to first link corresponding account with the same owner id in the Aipolabs dashboard.
         Returns:
             Any: The result (serializable) of the function execution. It varies based on the function.
         """
-        linked_account_owner_id = linked_account_owner_id or self.linked_account_owner_id
         logger.info(
             f"Handling function call with "
             f"name={function_name}, "
@@ -136,8 +132,6 @@ class Aipolabs:
             function_parameters = AipolabsExecuteFunction.wrap_function_parameters_if_not_present(
                 function_parameters
             )
-            if not linked_account_owner_id:
-                raise MissingLinkedAccountOwnerId()
             result = self.functions.execute(
                 **function_parameters, linked_account_owner_id=linked_account_owner_id
             )
@@ -147,8 +141,6 @@ class Aipolabs:
             # If the function name is not a meta function, we assume it is a direct function execution of
             # an aipolabs indexed function
             # TODO: check function exist if not throw excpetion?
-            if not linked_account_owner_id:
-                raise MissingLinkedAccountOwnerId()
             result = self.functions.execute(
                 function_name, function_parameters, linked_account_owner_id
             )
