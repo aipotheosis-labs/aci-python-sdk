@@ -29,7 +29,7 @@ This example demonstrates the simplest way to use Aipolabs functions with an LLM
 
 ## Key Differences Between example 2 and 3
 
-- In example 2, the retrieved function definition (e.g., `BRAVE_SEARCH__WEB_SEARCH`) is fed directly to the LLM as chat text, and the LLM generates parameters based on the function definition and then generates a `AIPOLABS_EXECUTE_FUNCTION` function call.
+- In example 2, the retrieved function definition (e.g., `BRAVE_SEARCH__WEB_SEARCH`) is fed directly to the LLM as chat text, and the LLM generates function arguments based on the function definition and then generates a `AIPOLABS_EXECUTE_FUNCTION` function call.
 
 - In example 3, the retrieved function definition is stored in the `tools_retrieved` list, and can be dynamically appended to or removed from the LLM's tool list. The LLM will generate a direct function call that matches the retrieved function. (e.g., `BRAVE_SEARCH__WEB_SEARCH`)
 

@@ -24,7 +24,7 @@ prompt = (
     "You can use AIPOLABS_SEARCH_APPS to find relevant apps (which include a set of functions), if you find Apps that might help with your tasks you can use AIPOLABS_SEARCH_FUNCTIONS to find relevant functions within certain apps."
     "You can also use AIPOLABS_SEARCH_FUNCTIONS directly to find relevant functions across all apps."
     "Once you have identified the function you need to use, you can use AIPOLABS_GET_FUNCTION_DEFINITION to get the definition of the function."
-    "You can then use AIPOLABS_EXECUTE_FUNCTION to execute the function provided you have the correct parameters."
+    "You can then use AIPOLABS_EXECUTE_FUNCTION to execute the function provided you have the correct input arguments."
     "So the typical order is AIPOLABS_SEARCH_APPS -> AIPOLABS_SEARCH_FUNCTIONS -> AIPOLABS_GET_FUNCTION_DEFINITION -> AIPOLABS_EXECUTE_FUNCTION."
 )
 

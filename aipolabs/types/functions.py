@@ -26,15 +26,15 @@ class FunctionExecutionParams(BaseModel):
     The function requires two key parameters:
     1. function_name: The name of the function to execute, which is the function name of the function that is
     retrieved using the AIPOLABS_GET_FUNCTION_DEFINITION meta function.
-    2. function_parameters: A dictionary containing all input parameters required to execute
-    the specified function. These parameters are also provided by the function definition
-    retrieved using the AIPOLABS_GET_FUNCTION_DEFINITION meta function. If a function does not require parameters, an empty dictionary should be provided.
+    2. function_arguments: A dictionary containing all input arguments required to execute
+    the specified function. These arguments are also provided by the function definition
+    retrieved using the AIPOLABS_GET_FUNCTION_DEFINITION meta function. If a function does not require input arguments, an empty dictionary should be provided.
     3. linked_account_owner_id: to specify with credentials of which linked account the
     function should be executed.
     """
 
     function_name: str
-    function_parameters: dict
+    function_arguments: dict
     linked_account_owner_id: str
 
 

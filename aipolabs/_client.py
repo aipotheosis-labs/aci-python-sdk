@@ -85,7 +85,7 @@ class Aipolabs:
     def handle_function_call(
         self,
         function_name: str,
-        function_parameters: dict,
+        function_arguments: dict,
         linked_account_owner_id: str,
         configured_only: bool = False,
         inference_provider: InferenceProvider = InferenceProvider.OPENAI,
@@ -99,7 +99,7 @@ class Aipolabs:
 
         Args:
             function_name: Name of the function to be called.
-            function_parameters: Dictionary containing the parameters for the function.
+            function_arguments: Dictionary containing the input arguments for the function.
             linked_account_owner_id: To specify the end-user (account owner) on behalf of whom you want to execute functions
             You need to first link corresponding account with the same owner id in the Aipolabs dashboard.
             configured_only: If True, App and Function search will only return results from configured apps under your project.
@@ -110,38 +110,36 @@ class Aipolabs:
         logger.info(
             f"Handling function call with "
             f"name={function_name}, "
-            f"params={function_parameters}, "
+            f"params={function_arguments}, "
             f"linked_account_owner_id={linked_account_owner_id}, "
             f"configured_only={configured_only}, "
             f"inference_provider={inference_provider}"
         )
         if function_name == AipolabsSearchApps.NAME:
-            apps = self.apps.search(**function_parameters, configured_only=configured_only)
+            apps = self.apps.search(**function_arguments, configured_only=configured_only)
 
             return [app.model_dump() for app in apps]
 
         elif function_name == AipolabsSearchFunctions.NAME:
-            functions = self.functions.search(
-                **function_parameters, configured_only=configured_only
-            )
+            functions = self.functions.search(**function_arguments, configured_only=configured_only)
 
             return [function.model_dump() for function in functions]
 
         elif function_name == AipolabsGetFunctionDefinition.NAME:
             return self.functions.get_definition(
-                **function_parameters, inference_provider=inference_provider
+                **function_arguments, inference_provider=inference_provider
             )
 
         elif function_name == AipolabsExecuteFunction.NAME:
-            # TODO: sometimes when using the fixed_tool approach llm most time doesn't put input parameters in the
-            # 'function_parameters' key as defined in AIPOLABS_EXECUTE_FUNCTION schema,
+            # TODO: sometimes when using the fixed_tool approach llm most time doesn't put input arguments in the
+            # 'function_arguments' key as defined in AIPOLABS_EXECUTE_FUNCTION schema,
             # so we need to handle that here. It is a bit hacky, we should improve this in the future
-            # TODO: consider adding post processing to auto fix all common errors in llm generated input parameters
-            function_parameters = AipolabsExecuteFunction.wrap_function_parameters_if_not_present(
-                function_parameters
+            # TODO: consider adding post processing to auto fix all common errors in llm generated input arguments
+            function_arguments = AipolabsExecuteFunction.wrap_function_arguments_if_not_present(
+                function_arguments
             )
             result = self.functions.execute(
-                **function_parameters, linked_account_owner_id=linked_account_owner_id
+                **function_arguments, linked_account_owner_id=linked_account_owner_id
             )
             return result.model_dump(exclude_none=True)
 
@@ -150,7 +148,7 @@ class Aipolabs:
             # an aipolabs indexed function
             # TODO: check function exist if not throw excpetion?
             result = self.functions.execute(
-                function_name, function_parameters, linked_account_owner_id
+                function_name, function_arguments, linked_account_owner_id
             )
             return result.model_dump(exclude_none=True)
 
