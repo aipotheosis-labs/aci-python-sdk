@@ -51,3 +51,13 @@ class UnknownError(AipolabsError):
     """Raised when an unknown error occurs"""
 
     pass
+
+
+class MissingLinkedAccountOwnerId(AipolabsError):
+    """Raised when linked_account_owner_id is missing for function execution"""
+
+    def __init__(self) -> None:
+        super().__init__(
+            "linked_account_owner_id is required for function execution, "
+            "please provide it to the 'Aipolabs' client constructor or override it in the 'handle_function_call' method"
+        )
