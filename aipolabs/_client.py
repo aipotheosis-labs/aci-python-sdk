@@ -89,6 +89,7 @@ class Aipolabs:
         function_name: str,
         function_parameters: dict,
         linked_account_owner_id: str,
+        configured_only: bool = False,
     ) -> Any:
         """Routes and executes function calls based on the function name.
         This can be a convenience function to handle function calls from LLM without you checking the function name.
@@ -102,6 +103,7 @@ class Aipolabs:
             function_parameters: Dictionary containing the parameters for the function.
             linked_account_owner_id: To specify the end-user (account owner) on behalf of whom you want to execute functions
             You need to first link corresponding account with the same owner id in the Aipolabs dashboard.
+            configured_only: If True, App and Function search will only return results from configured apps under your project.
         Returns:
             Any: The result (serializable) of the function execution. It varies based on the function.
         """
@@ -112,12 +114,14 @@ class Aipolabs:
             f"linked_account_owner_id={linked_account_owner_id}"
         )
         if function_name == AipolabsSearchApps.NAME:
-            apps = self.apps.search(**function_parameters)
+            apps = self.apps.search(**function_parameters, configured_only=configured_only)
 
             return [app.model_dump() for app in apps]
 
         elif function_name == AipolabsSearchFunctions.NAME:
-            functions = self.functions.search(**function_parameters)
+            functions = self.functions.search(
+                **function_parameters, configured_only=configured_only
+            )
 
             return [function.model_dump() for function in functions]
 
