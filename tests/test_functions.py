@@ -13,6 +13,7 @@ from aipolabs._exceptions import (
     UnknownError,
     ValidationError,
 )
+from aipolabs.types.functions import InferenceProvider
 
 from .utils import MOCK_BASE_URL
 
@@ -48,21 +49,39 @@ def test_search_functions_success(client: Aipolabs, search_params: dict) -> None
 
 
 @respx.mock
-def test_get_function_definition_success(client: Aipolabs) -> None:
-    mock_response = {
-        "type": "function",
-        "function": {
-            "name": "string",
-            "strict": True,
-            "description": "string",
-            "parameters": {},
-        },
-    }
-    route = respx.get(f"{MOCK_BASE_URL}functions/{MOCK_FUNCTION_NAME}/definition").mock(
-        return_value=httpx.Response(200, json=mock_response)
-    )
+@pytest.mark.parametrize(
+    "inference_provider, mock_response",
+    [
+        (
+            InferenceProvider.OPENAI,
+            {
+                "type": "function",
+                "function": {
+                    "name": "function_name",
+                    "description": "function_description",
+                    "parameters": {},
+                },
+            },
+        ),
+        (
+            InferenceProvider.ANTHROPIC,
+            {
+                "name": "function_name",
+                "description": "function_description",
+                "input_schema": {},
+            },
+        ),
+    ],
+)
+def test_get_function_definition_success(
+    client: Aipolabs, inference_provider: InferenceProvider, mock_response: dict
+) -> None:
+    route = respx.get(
+        f"{MOCK_BASE_URL}functions/{MOCK_FUNCTION_NAME}/definition",
+        params={"inference_provider": inference_provider},
+    ).mock(return_value=httpx.Response(200, json=mock_response))
 
-    response = client.functions.get_definition(MOCK_FUNCTION_NAME)
+    response = client.functions.get_definition(MOCK_FUNCTION_NAME, inference_provider)
     assert response == mock_response
     assert route.call_count == 1, "should not retry"
 

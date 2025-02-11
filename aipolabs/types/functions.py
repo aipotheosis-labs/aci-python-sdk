@@ -1,6 +1,12 @@
+from enum import Enum
 from typing import Any, ClassVar
 
 from pydantic import BaseModel
+
+
+class InferenceProvider(str, Enum):
+    OPENAI = "openai"
+    ANTHROPIC = "anthropic"
 
 
 class GetFunctionDefinitionParams(BaseModel):
@@ -11,7 +17,7 @@ class GetFunctionDefinitionParams(BaseModel):
     """
 
     function_name: str
-    inference_provider: str | None
+    inference_provider: InferenceProvider
 
 
 class FunctionExecutionParams(BaseModel):
