@@ -39,4 +39,5 @@ The examples are runnable, for a quick setup:
 - Clone the whole repository and install dependencies `poetry install`
 - Set your OpenAI API key (set as `OPENAI_API_KEY` in your environment)
 - Set your Aipolabs API key (set as `AIPOLABS_API_KEY` in your environment)
+- Change the `linked_account_owner_id` in the `Aipolabs` client constructor or override it in the `handle_function_call` method
 - Run any example: `poetry run python examples/agent_with_pre_planned_functions.py`

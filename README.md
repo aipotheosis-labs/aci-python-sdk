@@ -30,7 +30,11 @@ from aipolabs import Aipolabs
 
 client = Aipolabs(
     # it reads from environment variable by default so you can omit it if you set it in your environment
-    api_key=os.environ.get("AIPOLABS_API_KEY")
+    api_key=os.environ.get("AIPOLABS_API_KEY"),
+    # Optional (alternatively you can provide it on function level).
+    # This is to specify the end-user (account owner) on behalf of whom you want to execute functions
+    # You need to first link corresponding account with the same owner id in the Aipolabs dashboard.
+    linked_account_owner_id="john_doe"
 )
 ```
 
@@ -71,6 +75,7 @@ from aipolabs.types.functions import Function, FunctionExecutionResult
 functions: list[Function] = client.functions.search(
     app_names=["BRAVE_SEARCH", "TAVILY"],
     intent="I want to search the web",
+    configured_only=True,
     limit=10,
     offset=0
 )
@@ -86,7 +91,7 @@ function_definition: dict = client.functions.get(function_name="BRAVE_SEARCH__WE
 # execute a function with the provided parameters
 result: FunctionExecutionResult = client.functions.execute(
     function_name="BRAVE_SEARCH__WEB_SEARCH",
-    function_parameters={"query": "what is the weather in barcelona"}
+    function_parameters={"query": "what is the weather in barcelona"},
 )
 
 if result.success:

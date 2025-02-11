@@ -11,7 +11,7 @@ load_dotenv()
 # gets OPENAI_API_KEY from your environment variables
 openai = OpenAI()
 # gets AIPOLABS_API_KEY from your environment variables
-aipolabs = Aipolabs()
+aipolabs = Aipolabs(linked_account_owner_id="change_this_to_your_linked_account_owner_id")
 
 prompt = (
     "You are a helpful assistant with access to a unlimited number of tools via three meta functions: "
