@@ -61,7 +61,7 @@ app_details: AppDetails = client.apps.get(app_name="BRAVE_SEARCH")
 ### Functions
 #### Types
 ```python
-from aipolabs.types.functions import Function, FunctionExecutionResult
+from aipolabs.types.functions import Function, FunctionExecutionResult, InferenceProvider
 ```
 
 #### Methods
@@ -79,8 +79,11 @@ functions: list[Function] = client.functions.search(
 
 ```python
 # get function definition of a specific function, this is the schema you can feed into LLM
-# the actual format is defined by the inference provider, currently only openai is supported
-function_definition: dict = client.functions.get(function_name="BRAVE_SEARCH__WEB_SEARCH")
+# the actual format is defined by the inference provider
+function_definition: dict = client.functions.get_definition(
+    function_name="BRAVE_SEARCH__WEB_SEARCH",
+    inference_provider=InferenceProvider.OPENAI
+)
 ```
 
 ```python
@@ -88,6 +91,7 @@ function_definition: dict = client.functions.get(function_name="BRAVE_SEARCH__WE
 result: FunctionExecutionResult = client.functions.execute(
     function_name="BRAVE_SEARCH__WEB_SEARCH",
     function_parameters={"query": {"q": "what is the weather in barcelona"}},
+    linked_account_owner_id="john_doe"
 )
 
 if result.success:
@@ -118,7 +122,11 @@ tools = [
 ```python
 # unified function calling handler
 result = client.handle_function_call(
-    tool_call.function.name, json.loads(tool_call.function.arguments)
+    tool_call.function.name,
+    json.loads(tool_call.function.arguments),
+    linked_account_owner_id="john_doe",
+    configured_only=True,
+    inference_provider=InferenceProvider.OPENAI
 )
 ```
 
