@@ -1,4 +1,5 @@
 import json
+import os
 
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -7,6 +8,9 @@ from aipolabs import Aipolabs, meta_functions
 from aipolabs.utils._logging import create_headline
 
 load_dotenv()
+LINKED_ACCOUNT_OWNER_ID = os.getenv("LINKED_ACCOUNT_OWNER_ID", "")
+if not LINKED_ACCOUNT_OWNER_ID:
+    raise ValueError("LINKED_ACCOUNT_OWNER_ID is not set")
 
 # gets OPENAI_API_KEY from your environment variables
 openai = OpenAI()
@@ -77,7 +81,7 @@ def main() -> None:
             result = aipolabs.handle_function_call(
                 tool_call.function.name,
                 json.loads(tool_call.function.arguments),
-                linked_account_owner_id="change_this_to_your_linked_account_owner_id",
+                linked_account_owner_id=LINKED_ACCOUNT_OWNER_ID,
             )
 
             print(f"{create_headline('Function Call Result')} \n {result}")
