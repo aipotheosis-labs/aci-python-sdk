@@ -5,7 +5,7 @@ from aipolabs import Aipolabs
 from aipolabs._constants import DEFAULT_AIPOLABS_BASE_URL
 from aipolabs._exceptions import APIKeyNotFound
 
-from .conftest import MOCK_API_KEY, MOCK_BASE_URL
+from .utils import MOCK_API_KEY, MOCK_BASE_URL
 
 
 def test_client_initialization() -> None:
