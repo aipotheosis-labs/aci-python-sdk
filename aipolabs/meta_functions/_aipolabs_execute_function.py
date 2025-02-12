@@ -21,21 +21,21 @@ SCHEMA = {
                     "type": "string",
                     "description": f"The name of the function to execute, which is retrieved from the {AipolabsGetFunctionDefinition.NAME} function.",
                 },
-                "function_parameters": {
+                "function_arguments": {
                     "type": "object",
                     "description": "A dictionary containing key-value pairs of input parameters required by the specified function. The parameter names and types must match those defined in the function definition previously retrieved. If the function requires no parameters, provide an empty object.",
                     "additionalProperties": True,
                 },
             },
-            "required": ["function_name", "function_parameters"],
+            "required": ["function_name", "function_arguments"],
             "additionalProperties": False,
         },
     },
 }
 
 
-def wrap_function_parameters_if_not_present(obj: dict) -> dict:
-    if "function_parameters" not in obj:
+def wrap_function_arguments_if_not_present(obj: dict) -> dict:
+    if "function_arguments" not in obj:
         # Create a copy of the input dict
         processed_obj = obj.copy()
         if "function_name" not in processed_obj:
@@ -45,7 +45,7 @@ def wrap_function_parameters_if_not_present(obj: dict) -> dict:
         # Create new dict with correct structure
         processed_obj = {
             "function_name": function_name,
-            "function_parameters": processed_obj,  # All remaining fields go here
+            "function_arguments": processed_obj,  # All remaining fields go here
         }
         return processed_obj
     return obj

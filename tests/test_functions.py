@@ -19,7 +19,7 @@ from .utils import MOCK_BASE_URL
 
 MOCK_LINKED_ACCOUNT_OWNER_ID = "123"
 MOCK_FUNCTION_NAME = "TEST_FUNCTION"
-MOCK_FUNCTION_PARAMETERS = {"param1": "value1", "param2": "value2"}
+MOCK_FUNCTION_ARGUMENTS = {"param1": "value1", "param2": "value2"}
 
 
 @respx.mock
@@ -127,20 +127,20 @@ def test_get_function_definition_not_found(client: Aipolabs) -> None:
 
 @respx.mock
 @pytest.mark.parametrize(
-    "function_parameters",
+    "function_arguments",
     [
         {},
-        MOCK_FUNCTION_PARAMETERS,
+        MOCK_FUNCTION_ARGUMENTS,
     ],
 )
-def test_execute_function_success(client: Aipolabs, function_parameters: dict) -> None:
+def test_execute_function_success(client: Aipolabs, function_arguments: dict) -> None:
     mock_response = {"success": True, "data": "string"}
     route = respx.post(f"{MOCK_BASE_URL}functions/{MOCK_FUNCTION_NAME}/execute").mock(
         return_value=httpx.Response(200, json=mock_response)
     )
 
     response = client.functions.execute(
-        MOCK_FUNCTION_NAME, function_parameters, MOCK_LINKED_ACCOUNT_OWNER_ID
+        MOCK_FUNCTION_NAME, function_arguments, MOCK_LINKED_ACCOUNT_OWNER_ID
     )
     assert response.model_dump(exclude_none=True) == mock_response
     assert route.call_count == 1, "should not retry"
@@ -154,7 +154,7 @@ def test_execute_function_bad_request(client: Aipolabs) -> None:
 
     with pytest.raises(ValidationError) as exc_info:
         client.functions.execute(
-            MOCK_FUNCTION_NAME, MOCK_FUNCTION_PARAMETERS, MOCK_LINKED_ACCOUNT_OWNER_ID
+            MOCK_FUNCTION_NAME, MOCK_FUNCTION_ARGUMENTS, MOCK_LINKED_ACCOUNT_OWNER_ID
         )
 
     assert "Bad request" in str(exc_info.value)
@@ -169,7 +169,7 @@ def test_execute_function_rate_limit_exceeded(client: Aipolabs) -> None:
 
     with pytest.raises(RateLimitError) as exc_info:
         client.functions.execute(
-            MOCK_FUNCTION_NAME, MOCK_FUNCTION_PARAMETERS, MOCK_LINKED_ACCOUNT_OWNER_ID
+            MOCK_FUNCTION_NAME, MOCK_FUNCTION_ARGUMENTS, MOCK_LINKED_ACCOUNT_OWNER_ID
         )
 
     assert "Rate limit exceeded" in str(exc_info.value)
@@ -184,7 +184,7 @@ def test_execute_function_server_error(client: Aipolabs) -> None:
 
     with pytest.raises(ServerError) as exc_info:
         client.functions.execute(
-            MOCK_FUNCTION_NAME, MOCK_FUNCTION_PARAMETERS, MOCK_LINKED_ACCOUNT_OWNER_ID
+            MOCK_FUNCTION_NAME, MOCK_FUNCTION_ARGUMENTS, MOCK_LINKED_ACCOUNT_OWNER_ID
         )
 
     assert route.call_count == DEFAULT_MAX_RETRIES, "should retry"
@@ -199,7 +199,7 @@ def test_execute_function_unknown_error(client: Aipolabs) -> None:
 
     with pytest.raises(UnknownError):
         client.functions.execute(
-            MOCK_FUNCTION_NAME, MOCK_FUNCTION_PARAMETERS, MOCK_LINKED_ACCOUNT_OWNER_ID
+            MOCK_FUNCTION_NAME, MOCK_FUNCTION_ARGUMENTS, MOCK_LINKED_ACCOUNT_OWNER_ID
         )
 
     assert route.call_count == DEFAULT_MAX_RETRIES, "should retry"
@@ -213,7 +213,7 @@ def test_execute_function_timeout_exception(client: Aipolabs) -> None:
 
     with pytest.raises(httpx.TimeoutException) as exc_info:
         client.functions.execute(
-            MOCK_FUNCTION_NAME, MOCK_FUNCTION_PARAMETERS, MOCK_LINKED_ACCOUNT_OWNER_ID
+            MOCK_FUNCTION_NAME, MOCK_FUNCTION_ARGUMENTS, MOCK_LINKED_ACCOUNT_OWNER_ID
         )
 
     assert "Request timed out" in str(exc_info.value)
@@ -228,7 +228,7 @@ def test_execute_function_network_error(client: Aipolabs) -> None:
 
     with pytest.raises(httpx.NetworkError) as exc_info:
         client.functions.execute(
-            MOCK_FUNCTION_NAME, MOCK_FUNCTION_PARAMETERS, MOCK_LINKED_ACCOUNT_OWNER_ID
+            MOCK_FUNCTION_NAME, MOCK_FUNCTION_ARGUMENTS, MOCK_LINKED_ACCOUNT_OWNER_ID
         )
 
     assert "Network error" in str(exc_info.value)
@@ -249,7 +249,7 @@ def test_execute_function_retry_on_server_error(client: Aipolabs) -> None:
     )
 
     response = client.functions.execute(
-        MOCK_FUNCTION_NAME, MOCK_FUNCTION_PARAMETERS, MOCK_LINKED_ACCOUNT_OWNER_ID
+        MOCK_FUNCTION_NAME, MOCK_FUNCTION_ARGUMENTS, MOCK_LINKED_ACCOUNT_OWNER_ID
     )
     assert route.call_count == 3, "should retry until success"
     assert response.model_dump(exclude_none=True) == mock_success_response
@@ -269,7 +269,7 @@ def test_execute_function_retry_exhausted(client: Aipolabs) -> None:
 
     with pytest.raises(ServerError) as exc_info:
         client.functions.execute(
-            MOCK_FUNCTION_NAME, MOCK_FUNCTION_PARAMETERS, MOCK_LINKED_ACCOUNT_OWNER_ID
+            MOCK_FUNCTION_NAME, MOCK_FUNCTION_ARGUMENTS, MOCK_LINKED_ACCOUNT_OWNER_ID
         )
 
     assert route.call_count == DEFAULT_MAX_RETRIES, "should retry"

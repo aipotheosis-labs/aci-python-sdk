@@ -29,7 +29,7 @@ class FunctionsResource(APIResource):
         limit: int | None = None,
         offset: int | None = None,
     ) -> list[Function]:
-        """Searches for functions using the provided parameters.
+        """Searches for functions.
 
         Args:
             app_names: List of app names to filter functions by.
@@ -99,13 +99,13 @@ class FunctionsResource(APIResource):
 
     @retry(**retry_config)
     def execute(
-        self, function_name: str, function_parameters: dict, linked_account_owner_id: str
+        self, function_name: str, function_arguments: dict, linked_account_owner_id: str
     ) -> FunctionExecutionResult:
-        """Executes a Aipolabs indexed function with the provided parameters.
+        """Executes a Aipolabs indexed function with the provided arguments.
 
         Args:
             function_name: Name of the function to execute.
-            function_parameters: Dictionary containing the input parameters for the function.
+            function_arguments: Dictionary containing the input arguments for the function.
             linked_account_owner_id: to specify with credentials of which linked account the
             function should be executed.
         Returns:
@@ -116,13 +116,13 @@ class FunctionsResource(APIResource):
         """
         validated_params = FunctionExecutionParams(
             function_name=function_name,
-            function_parameters=function_parameters,
+            function_arguments=function_arguments,
             linked_account_owner_id=linked_account_owner_id,
         )
 
         logger.info(f"Executing function with: {validated_params.model_dump()}")
         request_body = {
-            "function_input": validated_params.function_parameters,
+            "function_input": validated_params.function_arguments,
         }
         response = self._httpx_client.post(
             f"functions/{validated_params.function_name}/execute",

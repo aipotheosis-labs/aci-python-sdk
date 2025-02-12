@@ -19,7 +19,7 @@ class AppsResource(APIResource):
         limit: int | None = None,
         offset: int | None = None,
     ) -> list[App]:
-        """Searches for apps using the provided parameters.
+        """Search for apps.
 
         Args:
             intent: search results will be sorted by relevance to this intent.
