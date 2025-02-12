@@ -17,6 +17,7 @@ from aipolabs.meta_functions import (
 )
 from aipolabs.resource.apps import AppsResource
 from aipolabs.resource.functions import FunctionsResource
+from aipolabs.types.functions import InferenceProvider
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -31,7 +32,6 @@ class Aipolabs:
     Attributes:
         api_key (str): The API key used for authentication.
         base_url (str | httpx.URL): The base URL for API requests.
-        inference_provider (str): The inference provider (currently only 'openai').
         headers (dict): HTTP headers used in requests.
         client (httpx.Client): The HTTP client for making requests.
     """
@@ -60,8 +60,6 @@ class Aipolabs:
         if base_url is None:
             base_url = os.environ.get("AIPOLABS_BASE_URL", DEFAULT_AIPOLABS_BASE_URL)
         self.base_url = self._enforce_trailing_slash(httpx.URL(base_url))
-        # TODO: currently only openai is supported
-        self.inference_provider = "openai"
         self.headers = {
             "Content-Type": "application/json",
             "x-api-key": api_key,
@@ -70,7 +68,7 @@ class Aipolabs:
 
         # Initialize resource clients
         self.apps = AppsResource(self.httpx_client)
-        self.functions = FunctionsResource(self.httpx_client, self.inference_provider)
+        self.functions = FunctionsResource(self.httpx_client)
 
     def __enter__(self) -> Aipolabs:
         self.httpx_client.__enter__()
@@ -90,6 +88,7 @@ class Aipolabs:
         function_parameters: dict,
         linked_account_owner_id: str,
         configured_only: bool = False,
+        inference_provider: InferenceProvider = InferenceProvider.OPENAI,
     ) -> Any:
         """Routes and executes function calls based on the function name.
         This can be a convenience function to handle function calls from LLM without you checking the function name.
@@ -104,6 +103,7 @@ class Aipolabs:
             linked_account_owner_id: To specify the end-user (account owner) on behalf of whom you want to execute functions
             You need to first link corresponding account with the same owner id in the Aipolabs dashboard.
             configured_only: If True, App and Function search will only return results from configured apps under your project.
+            inference_provider: Decides the function definition format returned by 'functions.get_definition'
         Returns:
             Any: The result (serializable) of the function execution. It varies based on the function.
         """
@@ -111,7 +111,9 @@ class Aipolabs:
             f"Handling function call with "
             f"name={function_name}, "
             f"params={function_parameters}, "
-            f"linked_account_owner_id={linked_account_owner_id}"
+            f"linked_account_owner_id={linked_account_owner_id}, "
+            f"configured_only={configured_only}, "
+            f"inference_provider={inference_provider}"
         )
         if function_name == AipolabsSearchApps.NAME:
             apps = self.apps.search(**function_parameters, configured_only=configured_only)
@@ -126,7 +128,9 @@ class Aipolabs:
             return [function.model_dump() for function in functions]
 
         elif function_name == AipolabsGetFunctionDefinition.NAME:
-            return self.functions.get_definition(**function_parameters)
+            return self.functions.get_definition(
+                **function_parameters, inference_provider=inference_provider
+            )
 
         elif function_name == AipolabsExecuteFunction.NAME:
             # TODO: sometimes when using the fixed_tool approach llm most time doesn't put input parameters in the

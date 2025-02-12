@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 from aipolabs import Aipolabs, meta_functions
+from aipolabs.types.functions import InferenceProvider
 from aipolabs.utils._logging import create_headline
 
 load_dotenv()
@@ -83,6 +84,8 @@ def main() -> None:
                 tool_call.function.name,
                 json.loads(tool_call.function.arguments),
                 linked_account_owner_id=LINKED_ACCOUNT_OWNER_ID,
+                configured_only=True,
+                inference_provider=InferenceProvider.OPENAI,
             )
             # if the function call is a get, add the retrieved function definition to the tools_retrieved
             if tool_call.function.name == meta_functions.AipolabsGetFunctionDefinition.NAME:
