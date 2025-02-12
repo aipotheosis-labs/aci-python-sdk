@@ -78,7 +78,7 @@ def test_get_function_definition_success(
 ) -> None:
     route = respx.get(
         f"{MOCK_BASE_URL}functions/{MOCK_FUNCTION_NAME}/definition",
-        params={"inference_provider": inference_provider},
+        params={"inference_provider": inference_provider.value},
     ).mock(return_value=httpx.Response(200, json=mock_response))
 
     response = client.functions.get_definition(MOCK_FUNCTION_NAME, inference_provider)

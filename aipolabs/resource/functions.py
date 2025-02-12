@@ -90,7 +90,7 @@ class FunctionsResource(APIResource):
         )
         response = self._httpx_client.get(
             f"functions/{validated_params.function_name}/definition",
-            params={"inference_provider": validated_params.inference_provider},
+            params={"inference_provider": validated_params.inference_provider.value},
         )
 
         function_definition: dict = self._handle_response(response)
