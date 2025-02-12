@@ -87,7 +87,7 @@ function_definition: dict = client.functions.get(function_name="BRAVE_SEARCH__WE
 # execute a function with the provided parameters
 result: FunctionExecutionResult = client.functions.execute(
     function_name="BRAVE_SEARCH__WEB_SEARCH",
-    function_parameters={"query": "what is the weather in barcelona"},
+    function_parameters={"query": {"q": "what is the weather in barcelona"}},
 )
 
 if result.success:
