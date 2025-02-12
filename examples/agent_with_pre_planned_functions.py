@@ -1,4 +1,5 @@
 import json
+import os
 
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -8,6 +9,9 @@ from aipolabs.types.functions import Function
 from aipolabs.utils._logging import create_headline
 
 load_dotenv()
+LINKED_ACCOUNT_OWNER_ID = os.getenv("LINKED_ACCOUNT_OWNER_ID", "")
+if not LINKED_ACCOUNT_OWNER_ID:
+    raise ValueError("LINKED_ACCOUNT_OWNER_ID is not set")
 
 # gets OPENAI_API_KEY from your environment variables
 openai = OpenAI()
@@ -16,7 +20,9 @@ aipolabs = Aipolabs()
 
 
 def main() -> None:
-    brave_search_function_definition = aipolabs.functions.get(Function.BRAVE_SEARCH__WEB_SEARCH)
+    brave_search_function_definition = aipolabs.functions.get_definition(
+        Function.BRAVE_SEARCH__WEB_SEARCH
+    )
 
     print(create_headline("Brave search function definition"))
     print(brave_search_function_definition)
@@ -46,15 +52,18 @@ def main() -> None:
         print(create_headline(f"Tool call: {tool_call.function.name}"))
         print(f"arguments: {tool_call.function.arguments}")
         # submit the selected function and its arguments to aipolabs backend for execution
-        result = aipolabs.functions.execute(
-            tool_call.function.name, json.loads(tool_call.function.arguments)
+        result = aipolabs.handle_function_call(
+            tool_call.function.name,
+            json.loads(tool_call.function.arguments),
+            linked_account_owner_id=LINKED_ACCOUNT_OWNER_ID,
         )
-        print(create_headline("Function execution result"))
-        # result["success"] indicates whether the function execution (not the request itself) was successful
-        if result.success:
-            print(result.data)
-        else:
-            print(result.error)
+        # alternatively, because this is a direct function execution you can use the following:
+        # result = aipolabs.functions.execute(
+        #     tool_call.function.name,
+        #     json.loads(tool_call.function.arguments),
+        #     linked_account_owner_id=LINKED_ACCOUNT_OWNER_ID,
+        # )
+        print(f"{create_headline('Function Call Result')} \n {result}")
 
 
 if __name__ == "__main__":

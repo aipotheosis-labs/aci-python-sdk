@@ -44,7 +44,13 @@ from aipolabs.types.apps import App, AppDetails
 ```python
 # search for apps, returns list of basic app data, sorted by relevance to the intent
 # all parameters are optional
-apps: list[App] = client.apps.search(intent="I want to search the web", limit=10, offset=0)
+apps: list[App] = client.apps.search(
+    intent="I want to search the web",
+    configured_only=True,
+    categories=["search"],
+    limit=10,
+    offset=0
+)
 ```
 
 ```python
@@ -65,6 +71,7 @@ from aipolabs.types.functions import Function, FunctionExecutionResult
 functions: list[Function] = client.functions.search(
     app_names=["BRAVE_SEARCH", "TAVILY"],
     intent="I want to search the web",
+    configured_only=True,
     limit=10,
     offset=0
 )
@@ -80,7 +87,7 @@ function_definition: dict = client.functions.get(function_name="BRAVE_SEARCH__WE
 # execute a function with the provided parameters
 result: FunctionExecutionResult = client.functions.execute(
     function_name="BRAVE_SEARCH__WEB_SEARCH",
-    function_parameters={"query": "what is the weather in barcelona"}
+    function_parameters={"query": {"q": "what is the weather in barcelona"}},
 )
 
 if result.success:

@@ -12,6 +12,8 @@ pyenv local 3.10
 poetry env use 3.10
 # install dependencies
 poetry install
+# run tests
+poetry run pytest
 ```
 
 ### Coding style
@@ -31,5 +33,3 @@ all the following tools are part of `pyproject.toml` dev dependencies, and are a
     "editor.defaultFormatter": "ms-python.black-formatter"
     }
     ```
-
-### Codee changes

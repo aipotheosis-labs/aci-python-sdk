@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Any
+from types import TracebackType
+from typing import Any, Optional, Type
 
 import httpx
 
@@ -36,7 +37,10 @@ class Aipolabs:
     """
 
     def __init__(
-        self, *, api_key: str | None = None, base_url: str | httpx.URL | None = None
+        self,
+        *,
+        api_key: str | None = None,
+        base_url: str | httpx.URL | None = None,
     ) -> None:
         """Create and initialize a new Aipolabs client.
 
@@ -68,7 +72,25 @@ class Aipolabs:
         self.apps = AppsResource(self.httpx_client)
         self.functions = FunctionsResource(self.httpx_client, self.inference_provider)
 
-    def handle_function_call(self, function_name: str, function_parameters: dict) -> Any:
+    def __enter__(self) -> Aipolabs:
+        self.httpx_client.__enter__()
+        return self
+
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[TracebackType],
+    ) -> None:
+        self.httpx_client.__exit__(exc_type, exc_val, exc_tb)
+
+    def handle_function_call(
+        self,
+        function_name: str,
+        function_parameters: dict,
+        linked_account_owner_id: str,
+        configured_only: bool = False,
+    ) -> Any:
         """Routes and executes function calls based on the function name.
         This can be a convenience function to handle function calls from LLM without you checking the function name.
 
@@ -79,25 +101,32 @@ class Aipolabs:
         Args:
             function_name: Name of the function to be called.
             function_parameters: Dictionary containing the parameters for the function.
-
+            linked_account_owner_id: To specify the end-user (account owner) on behalf of whom you want to execute functions
+            You need to first link corresponding account with the same owner id in the Aipolabs dashboard.
+            configured_only: If True, App and Function search will only return results from configured apps under your project.
         Returns:
             Any: The result (serializable) of the function execution. It varies based on the function.
         """
         logger.info(
-            f"Handling function call with name: {function_name} and params: {function_parameters}"
+            f"Handling function call with "
+            f"name={function_name}, "
+            f"params={function_parameters}, "
+            f"linked_account_owner_id={linked_account_owner_id}"
         )
         if function_name == AipolabsSearchApps.NAME:
-            apps = self.apps.search(**function_parameters)
+            apps = self.apps.search(**function_parameters, configured_only=configured_only)
 
             return [app.model_dump() for app in apps]
 
         elif function_name == AipolabsSearchFunctions.NAME:
-            functions = self.functions.search(**function_parameters)
+            functions = self.functions.search(
+                **function_parameters, configured_only=configured_only
+            )
 
             return [function.model_dump() for function in functions]
 
         elif function_name == AipolabsGetFunctionDefinition.NAME:
-            return self.functions.get(**function_parameters)
+            return self.functions.get_definition(**function_parameters)
 
         elif function_name == AipolabsExecuteFunction.NAME:
             # TODO: sometimes when using the fixed_tool approach llm most time doesn't put input parameters in the
@@ -107,14 +136,18 @@ class Aipolabs:
             function_parameters = AipolabsExecuteFunction.wrap_function_parameters_if_not_present(
                 function_parameters
             )
-            result = self.functions.execute(**function_parameters)
+            result = self.functions.execute(
+                **function_parameters, linked_account_owner_id=linked_account_owner_id
+            )
             return result.model_dump(exclude_none=True)
 
         else:
             # If the function name is not a meta function, we assume it is a direct function execution of
             # an aipolabs indexed function
             # TODO: check function exist if not throw excpetion?
-            result = self.functions.execute(function_name, function_parameters)
+            result = self.functions.execute(
+                function_name, function_parameters, linked_account_owner_id
+            )
             return result.model_dump(exclude_none=True)
 
     def _enforce_trailing_slash(self, url: httpx.URL) -> httpx.URL:

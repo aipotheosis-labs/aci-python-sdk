@@ -6,8 +6,8 @@ from pydantic import BaseModel
 class GetFunctionDefinitionParams(BaseModel):
     """Parameters for getting a function definition.
 
-    The backend require "inference_provider" parameter but this value should be set by
-    developer not LLM when using the sdk, so inference_provider parameter is not present in SCHEMA above.
+    The backend requires "inference_provider" parameter but this value should be set by the
+    developer and not LLM when using the sdk, so the 'inference_provider' parameter is not present in meta SCHEMA.
     """
 
     function_name: str
@@ -23,10 +23,13 @@ class FunctionExecutionParams(BaseModel):
     2. function_parameters: A dictionary containing all input parameters required to execute
     the specified function. These parameters are also provided by the function definition
     retrieved using the AIPOLABS_GET_FUNCTION_DEFINITION meta function. If a function does not require parameters, an empty dictionary should be provided.
+    3. linked_account_owner_id: to specify with credentials of which linked account the
+    function should be executed.
     """
 
     function_name: str
     function_parameters: dict
+    linked_account_owner_id: str
 
 
 class FunctionExecutionResult(BaseModel):
@@ -47,6 +50,7 @@ class SearchFunctionsParams(BaseModel):
 
     app_names: list[str] | None = None
     intent: str | None = None
+    configured_only: bool = False
     limit: int | None = None
     offset: int | None = None
 
