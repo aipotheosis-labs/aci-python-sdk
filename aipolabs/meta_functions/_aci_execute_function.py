@@ -1,14 +1,14 @@
 """
-This module defines the AIPOLABS_EXECUTE_FUNCTION meta function, which is used by LLM to submit
-execution requests for indexed functions on aipolabs backend.
+This module defines the ACI_EXECUTE_FUNCTION meta function, which is used by LLM to submit
+execution requests for indexed functions on aipolabs ACI backend.
 
 This module includes the schema definition for the function and a Pydantic model for
 validating the execution parameters.
 """
 
-import aipolabs.meta_functions._aipolabs_get_function_definition as AipolabsGetFunctionDefinition
+import aipolabs.meta_functions._aci_get_function_definition as ACIGetFunctionDefinition
 
-NAME = "AIPOLABS_EXECUTE_FUNCTION"
+NAME = "ACI_EXECUTE_FUNCTION"
 SCHEMA = {
     "type": "function",
     "function": {
@@ -19,7 +19,7 @@ SCHEMA = {
             "properties": {
                 "function_name": {
                     "type": "string",
-                    "description": f"The name of the function to execute, which is retrieved from the {AipolabsGetFunctionDefinition.NAME} function.",
+                    "description": f"The name of the function to execute, which is retrieved from the {ACIGetFunctionDefinition.NAME} function.",
                 },
                 "function_arguments": {
                     "type": "object",

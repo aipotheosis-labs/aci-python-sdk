@@ -1,15 +1,15 @@
-# Aipolabs Python SDK
+# Aipolabs ACI Python SDK
 
 [![PyPI version](https://img.shields.io/pypi/v/aipolabs.svg)](https://pypi.org/project/aipolabs/)
 
-The official Python SDK for the Aipolabs API.
+The official Python SDK for the Aipolabs ACI API.
 Currently in private beta, breaking changes are expected.
 
-The Aipolabs Python SDK provides convenient access to the Aipolabs REST API from any Python 3.10+
+The Aipolabs ACI Python SDK provides convenient access to the Aipolabs ACI REST API from any Python 3.10+
 application.
 
 ## Documentation
-The REST API documentation is available [here](https://api.aipolabs.xyz/v1/docs).
+The REST API documentation is available [here](https://docs.aci.dev/api-reference).
 
 ## Installation
 ```bash
@@ -22,15 +22,15 @@ poetry add aipolabs
 ```
 
 ## Usage
-Aipolabs platform is built with agent-first principles. Although you can call each of the APIs below any way you prefer in your application, we strongly recommend trying the [Agent-centric features](#agent-centric-features) and taking a look at the [examples](./examples/README.md) to get the most out of the platform and to enable the full potential and vision of future agentic applications.
+Aipolabs ACI platform is built with agent-first principles. Although you can call each of the APIs below any way you prefer in your application, we strongly recommend trying the [Agent-centric features](#agent-centric-features) and taking a look at the [examples](./examples/README.md) to get the most out of the platform and to enable the full potential and vision of future agentic applications.
 
 ### Client
 ```python
-from aipolabs import Aipolabs
+from aipolabs import ACI
 
-client = Aipolabs(
+client = ACI(
     # it reads from environment variable by default so you can omit it if you set it in your environment
-    api_key=os.environ.get("AIPOLABS_API_KEY")
+    api_key=os.environ.get("AIPOLABS_ACI_API_KEY")
 )
 ```
 
@@ -112,10 +112,10 @@ from aipolabs import meta_functions
 
 # meta functions
 tools = [
-    meta_functions.AipolabsSearchApps.SCHEMA,
-    meta_functions.AipolabsSearchFunctions.SCHEMA,
-    meta_functions.AipolabsGetFunctionDefinition.SCHEMA,
-    meta_functions.AipolabsExecuteFunction.SCHEMA,
+    meta_functions.ACISearchApps.SCHEMA,
+    meta_functions.ACISearchFunctions.SCHEMA,
+    meta_functions.ACIGetFunctionDefinition.SCHEMA,
+    meta_functions.ACIExecuteFunction.SCHEMA,
 ]
 ```
 
@@ -133,7 +133,7 @@ result = client.handle_function_call(
 There are mainly two ways to use the platform with the meta functions:
 
 - **Fully Autonomous**: Provide all 4 meta functions to the LLM, please see the [agent_with_dynamic_function_discovery_and_fixed_tools.py](./examples/agent_with_dynamic_function_discovery_and_fixed_tools.py) for more details.
-- **Semi Autonomous**: Provide all but `AipolabsExecuteFunction` to the LLM, and use the Unified Function Calling Handler to execute functions, please see the [agent_with_dynamic_function_discovery_and_dynamic_tools.py](./examples/agent_with_dynamic_function_discovery_and_dynamic_tools.py) for more details.
+- **Semi Autonomous**: Provide all but `ACIExecuteFunction` to the LLM, and use the Unified Function Calling Handler to execute functions, please see the [agent_with_dynamic_function_discovery_and_dynamic_tools.py](./examples/agent_with_dynamic_function_discovery_and_dynamic_tools.py) for more details.
 
 Please also see [agent_with_preplanned_tools.py](./examples/agent_with_preplanned_tools.py) for comparison where the specific functions are pre selected and provided to the LLM.
 
