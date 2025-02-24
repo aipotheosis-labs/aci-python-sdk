@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from aipolabs import Aipolabs
+from aipolabs import ACI
 from aipolabs.types.functions import Function, InferenceProvider
 from aipolabs.utils._logging import create_headline
 
@@ -15,12 +15,12 @@ if not LINKED_ACCOUNT_OWNER_ID:
 
 # gets OPENAI_API_KEY from your environment variables
 openai = OpenAI()
-# gets AIPOLABS_API_KEY from your environment variables
-aipolabs = Aipolabs()
+# gets AIPOLABS_ACI_API_KEY from your environment variables
+aci = ACI()
 
 
 def main() -> None:
-    brave_search_function_definition = aipolabs.functions.get_definition(
+    brave_search_function_definition = aci.functions.get_definition(
         Function.BRAVE_SEARCH__WEB_SEARCH
     )
 
@@ -36,7 +36,7 @@ def main() -> None:
             },
             {
                 "role": "user",
-                "content": "What is aipolabs?",
+                "content": "What is aipolabs ACI?",
             },
         ],
         tools=[brave_search_function_definition],
@@ -51,8 +51,8 @@ def main() -> None:
     if tool_call:
         print(create_headline(f"Tool call: {tool_call.function.name}"))
         print(f"arguments: {tool_call.function.arguments}")
-        # submit the selected function and its arguments to aipolabs backend for execution
-        result = aipolabs.handle_function_call(
+        # submit the selected function and its arguments to aipolabs ACI backend for execution
+        result = aci.handle_function_call(
             tool_call.function.name,
             json.loads(tool_call.function.arguments),
             linked_account_owner_id=LINKED_ACCOUNT_OWNER_ID,
@@ -60,7 +60,7 @@ def main() -> None:
             inference_provider=InferenceProvider.OPENAI,
         )
         # alternatively, because this is a direct function execution you can use the following:
-        # result = aipolabs.functions.execute(
+        # result = aci.functions.execute(
         #     tool_call.function.name,
         #     json.loads(tool_call.function.arguments),
         #     linked_account_owner_id=LINKED_ACCOUNT_OWNER_ID,

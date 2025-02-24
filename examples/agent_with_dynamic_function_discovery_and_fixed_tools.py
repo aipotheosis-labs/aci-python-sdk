@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from aipolabs import Aipolabs, meta_functions
+from aipolabs import ACI, meta_functions
 from aipolabs.types.functions import InferenceProvider
 from aipolabs.utils._logging import create_headline
 
@@ -15,25 +15,25 @@ if not LINKED_ACCOUNT_OWNER_ID:
 
 # gets OPENAI_API_KEY from your environment variables
 openai = OpenAI()
-# gets AIPOLABS_API_KEY from your environment variables
-aipolabs = Aipolabs()
+# gets AIPOLABS_ACI_API_KEY from your environment variables
+aci = ACI()
 
 prompt = (
     "You are a helpful assistant with access to a unlimited number of tools via four meta functions: "
-    "AIPOLABS_SEARCH_APPS, AIPOLABS_SEARCH_FUNCTIONS, AIPOLABS_GET_FUNCTION_DEFINITION, and AIPOLABS_EXECUTE_FUNCTION."
-    "You can use AIPOLABS_SEARCH_APPS to find relevant apps (which include a set of functions), if you find Apps that might help with your tasks you can use AIPOLABS_SEARCH_FUNCTIONS to find relevant functions within certain apps."
-    "You can also use AIPOLABS_SEARCH_FUNCTIONS directly to find relevant functions across all apps."
-    "Once you have identified the function you need to use, you can use AIPOLABS_GET_FUNCTION_DEFINITION to get the definition of the function."
-    "You can then use AIPOLABS_EXECUTE_FUNCTION to execute the function provided you have the correct input arguments."
-    "So the typical order is AIPOLABS_SEARCH_APPS -> AIPOLABS_SEARCH_FUNCTIONS -> AIPOLABS_GET_FUNCTION_DEFINITION -> AIPOLABS_EXECUTE_FUNCTION."
+    "ACI_SEARCH_APPS, ACI_SEARCH_FUNCTIONS, ACI_GET_FUNCTION_DEFINITION, and ACI_EXECUTE_FUNCTION."
+    "You can use ACI_SEARCH_APPS to find relevant apps (which include a set of functions), if you find Apps that might help with your tasks you can use ACI_SEARCH_FUNCTIONS to find relevant functions within certain apps."
+    "You can also use ACI_SEARCH_FUNCTIONS directly to find relevant functions across all apps."
+    "Once you have identified the function you need to use, you can use ACI_GET_FUNCTION_DEFINITION to get the definition of the function."
+    "You can then use ACI_EXECUTE_FUNCTION to execute the function provided you have the correct input arguments."
+    "So the typical order is ACI_SEARCH_APPS -> ACI_SEARCH_FUNCTIONS -> ACI_GET_FUNCTION_DEFINITION -> ACI_EXECUTE_FUNCTION."
 )
 
 # aipolabs meta functions for the LLM to discover the available executale functions dynamically
 tools_meta = [
-    meta_functions.AipolabsSearchApps.SCHEMA,
-    meta_functions.AipolabsSearchFunctions.SCHEMA,
-    meta_functions.AipolabsGetFunctionDefinition.SCHEMA,
-    meta_functions.AipolabsExecuteFunction.SCHEMA,
+    meta_functions.ACISearchApps.SCHEMA,
+    meta_functions.ACISearchFunctions.SCHEMA,
+    meta_functions.ACIGetFunctionDefinition.SCHEMA,
+    meta_functions.ACIExecuteFunction.SCHEMA,
 ]
 
 
@@ -52,7 +52,7 @@ def main() -> None:
                 },
                 {
                     "role": "user",
-                    "content": "Can you search online for some information about aipolabs? Use whichever search tool you find most suitable for the task via AIPOLABS meta functions.",
+                    "content": "Can you search online for some information about aipolabs ACI? Use whichever search tool you find most suitable for the task via the ACI meta functions.",
                 },
             ]
             + chat_history,
@@ -79,7 +79,7 @@ def main() -> None:
             )
 
             chat_history.append({"role": "assistant", "tool_calls": [tool_call]})
-            result = aipolabs.handle_function_call(
+            result = aci.handle_function_call(
                 tool_call.function.name,
                 json.loads(tool_call.function.arguments),
                 linked_account_owner_id=LINKED_ACCOUNT_OWNER_ID,

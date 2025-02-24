@@ -2,7 +2,7 @@ import httpx
 import pytest
 import respx
 
-from aipolabs import Aipolabs
+from aipolabs import ACI
 
 from .utils import MOCK_BASE_URL
 
@@ -21,7 +21,7 @@ from .utils import MOCK_BASE_URL
         },
     ],
 )
-def test_search_apps_success(client: Aipolabs, search_params: dict) -> None:
+def test_search_apps_success(client: ACI, search_params: dict) -> None:
     mock_response = [{"name": "Test App", "description": "Test Description"}]
 
     route = respx.get(f"{MOCK_BASE_URL}apps/search").mock(
@@ -34,7 +34,7 @@ def test_search_apps_success(client: Aipolabs, search_params: dict) -> None:
 
 
 @respx.mock
-def test_get_app_success(client: Aipolabs) -> None:
+def test_get_app_success(client: ACI) -> None:
     app_name = "TEST_APP"
     mock_response = {
         "name": "Test App",

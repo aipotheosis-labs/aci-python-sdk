@@ -2,7 +2,7 @@ import httpx
 import pytest
 import respx
 
-from aipolabs import Aipolabs
+from aipolabs import ACI
 from aipolabs._constants import DEFAULT_MAX_RETRIES
 from aipolabs._exceptions import (
     AuthenticationError,
@@ -36,7 +36,7 @@ MOCK_FUNCTION_ARGUMENTS = {"param1": "value1", "param2": "value2"}
         },
     ],
 )
-def test_search_functions_success(client: Aipolabs, search_params: dict) -> None:
+def test_search_functions_success(client: ACI, search_params: dict) -> None:
     mock_response = [{"name": "string", "description": "string"}]
 
     route = respx.get(f"{MOCK_BASE_URL}functions/search").mock(
@@ -74,7 +74,7 @@ def test_search_functions_success(client: Aipolabs, search_params: dict) -> None
     ],
 )
 def test_get_function_definition_success(
-    client: Aipolabs, inference_provider: InferenceProvider, mock_response: dict
+    client: ACI, inference_provider: InferenceProvider, mock_response: dict
 ) -> None:
     route = respx.get(
         f"{MOCK_BASE_URL}functions/{MOCK_FUNCTION_NAME}/definition",
@@ -87,7 +87,7 @@ def test_get_function_definition_success(
 
 
 @respx.mock
-def test_get_function_definition_unauthorized(client: Aipolabs) -> None:
+def test_get_function_definition_unauthorized(client: ACI) -> None:
     route = respx.get(f"{MOCK_BASE_URL}functions/{MOCK_FUNCTION_NAME}/definition").mock(
         return_value=httpx.Response(401, json={"message": "Unauthorized"})
     )
@@ -100,7 +100,7 @@ def test_get_function_definition_unauthorized(client: Aipolabs) -> None:
 
 
 @respx.mock
-def test_get_function_definition_forbidden(client: Aipolabs) -> None:
+def test_get_function_definition_forbidden(client: ACI) -> None:
     route = respx.get(f"{MOCK_BASE_URL}functions/{MOCK_FUNCTION_NAME}/definition").mock(
         return_value=httpx.Response(403, json={"message": "Forbidden"})
     )
@@ -113,7 +113,7 @@ def test_get_function_definition_forbidden(client: Aipolabs) -> None:
 
 
 @respx.mock
-def test_get_function_definition_not_found(client: Aipolabs) -> None:
+def test_get_function_definition_not_found(client: ACI) -> None:
     route = respx.get(f"{MOCK_BASE_URL}functions/{MOCK_FUNCTION_NAME}/definition").mock(
         return_value=httpx.Response(404, json={"message": "Function not found"})
     )
@@ -133,7 +133,7 @@ def test_get_function_definition_not_found(client: Aipolabs) -> None:
         MOCK_FUNCTION_ARGUMENTS,
     ],
 )
-def test_execute_function_success(client: Aipolabs, function_arguments: dict) -> None:
+def test_execute_function_success(client: ACI, function_arguments: dict) -> None:
     mock_response = {"success": True, "data": "string"}
     route = respx.post(f"{MOCK_BASE_URL}functions/{MOCK_FUNCTION_NAME}/execute").mock(
         return_value=httpx.Response(200, json=mock_response)
@@ -147,7 +147,7 @@ def test_execute_function_success(client: Aipolabs, function_arguments: dict) ->
 
 
 @respx.mock
-def test_execute_function_bad_request(client: Aipolabs) -> None:
+def test_execute_function_bad_request(client: ACI) -> None:
     route = respx.post(f"{MOCK_BASE_URL}functions/{MOCK_FUNCTION_NAME}/execute").mock(
         return_value=httpx.Response(400, json={"message": "Bad request"})
     )
@@ -162,7 +162,7 @@ def test_execute_function_bad_request(client: Aipolabs) -> None:
 
 
 @respx.mock
-def test_execute_function_rate_limit_exceeded(client: Aipolabs) -> None:
+def test_execute_function_rate_limit_exceeded(client: ACI) -> None:
     route = respx.post(f"{MOCK_BASE_URL}functions/{MOCK_FUNCTION_NAME}/execute").mock(
         return_value=httpx.Response(429, json={"message": "Rate limit exceeded"})
     )
@@ -177,7 +177,7 @@ def test_execute_function_rate_limit_exceeded(client: Aipolabs) -> None:
 
 
 @respx.mock
-def test_execute_function_server_error(client: Aipolabs) -> None:
+def test_execute_function_server_error(client: ACI) -> None:
     route = respx.post(f"{MOCK_BASE_URL}functions/{MOCK_FUNCTION_NAME}/execute").mock(
         return_value=httpx.Response(500, json={"message": "Internal server error"})
     )
@@ -192,7 +192,7 @@ def test_execute_function_server_error(client: Aipolabs) -> None:
 
 
 @respx.mock
-def test_execute_function_unknown_error(client: Aipolabs) -> None:
+def test_execute_function_unknown_error(client: ACI) -> None:
     route = respx.post(f"{MOCK_BASE_URL}functions/{MOCK_FUNCTION_NAME}/execute").mock(
         return_value=httpx.Response(418, json={"message": "I'm a teapot"})
     )
@@ -206,7 +206,7 @@ def test_execute_function_unknown_error(client: Aipolabs) -> None:
 
 
 @respx.mock
-def test_execute_function_timeout_exception(client: Aipolabs) -> None:
+def test_execute_function_timeout_exception(client: ACI) -> None:
     route = respx.post(f"{MOCK_BASE_URL}functions/{MOCK_FUNCTION_NAME}/execute").mock(
         side_effect=httpx.TimeoutException("Request timed out")
     )
@@ -221,7 +221,7 @@ def test_execute_function_timeout_exception(client: Aipolabs) -> None:
 
 
 @respx.mock
-def test_execute_function_network_error(client: Aipolabs) -> None:
+def test_execute_function_network_error(client: ACI) -> None:
     route = respx.post(f"{MOCK_BASE_URL}functions/{MOCK_FUNCTION_NAME}/execute").mock(
         side_effect=httpx.NetworkError("Network error")
     )
@@ -236,7 +236,7 @@ def test_execute_function_network_error(client: Aipolabs) -> None:
 
 
 @respx.mock
-def test_execute_function_retry_on_server_error(client: Aipolabs) -> None:
+def test_execute_function_retry_on_server_error(client: ACI) -> None:
     mock_success_response = {"success": True, "data": "string"}
 
     # Simulate two server errors followed by a successful response
@@ -256,7 +256,7 @@ def test_execute_function_retry_on_server_error(client: Aipolabs) -> None:
 
 
 @respx.mock
-def test_execute_function_retry_exhausted(client: Aipolabs) -> None:
+def test_execute_function_retry_exhausted(client: ACI) -> None:
     route = respx.post(f"{MOCK_BASE_URL}functions/{MOCK_FUNCTION_NAME}/execute").mock(
         side_effect=[
             httpx.Response(500, json={"message": "Internal server error"}),

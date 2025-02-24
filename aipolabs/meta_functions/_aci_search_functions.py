@@ -1,11 +1,11 @@
 """
-This module defines the AIPOLABS_SEARCH_FUNCTIONS meta function, which is used by LLM to search for
+This module defines the ACI_SEARCH_FUNCTIONS meta function, which is used by LLM to search for
 relevant executable functions that can help complete a task.
 
-You can filter by adding app names, which can be retrieved using the AIPOLABS_SEARCH_APPS meta function.
+You can filter by adding app names, which can be retrieved using the ACI_SEARCH_APPS meta function.
 """
 
-NAME = "AIPOLABS_SEARCH_FUNCTIONS"
+NAME = "ACI_SEARCH_FUNCTIONS"
 SCHEMA = {
     "type": "function",
     "function": {
@@ -18,7 +18,7 @@ SCHEMA = {
                     "type": ["array", "null"],
                     "items": {"type": "string"},
                     "default": "null",
-                    "description": "The names of the apps you want to search functions for If provided, the search will be limited to the functions of the specified apps. Use null to search functions across all apps. You can find app names by first using the AIPOLABS_SEARCH_APPS function.",
+                    "description": "The names of the apps you want to search functions for If provided, the search will be limited to the functions of the specified apps. Use null to search functions across all apps. You can find app names by first using the ACI_SEARCH_APPS function.",
                 },
                 "intent": {
                     "type": ["string", "null"],

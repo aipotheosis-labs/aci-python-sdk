@@ -1,10 +1,10 @@
 [tool.poetry]
 name = "aipolabs"
 version = "0.0.1-beta.3"
-description = "The official Python SDK for the Aipolabs (Aipotheosis Labs) API"
+description = "The official Python SDK for the ACI API by Aipolabs (Aipotheosis Labs)"
 authors = ["Aipolabs <team@aipolabs.xyz>"]
 readme = "README.md"
-homepage = "https://aipolabs.xyz"
+homepage = "https://aci.dev"
 repository = "https://github.com/aipotheosis-labs/aipolabs-python"
 packages = [
     { include = "aipolabs", from = "." }

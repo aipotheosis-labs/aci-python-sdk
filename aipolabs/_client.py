@@ -7,13 +7,13 @@ from typing import Any, Optional, Type
 
 import httpx
 
-from aipolabs._constants import DEFAULT_AIPOLABS_BASE_URL
+from aipolabs._constants import DEFAULT_SERVER_URL
 from aipolabs._exceptions import APIKeyNotFound
 from aipolabs.meta_functions import (
-    AipolabsExecuteFunction,
-    AipolabsGetFunctionDefinition,
-    AipolabsSearchApps,
-    AipolabsSearchFunctions,
+    ACIExecuteFunction,
+    ACIGetFunctionDefinition,
+    ACISearchApps,
+    ACISearchFunctions,
 )
 from aipolabs.resource.apps import AppsResource
 from aipolabs.resource.functions import FunctionsResource
@@ -22,10 +22,10 @@ from aipolabs.types.functions import InferenceProvider
 logger: logging.Logger = logging.getLogger(__name__)
 
 
-class Aipolabs:
-    """Client for interacting with the Aipolabs API.
+class ACI:
+    """Client for interacting with the Aipolabs ACI API.
 
-    This class provides methods to interact with various Aipolabs API endpoints,
+    This class provides methods to interact with various Aipolabs ACI endpoints,
     including searching apps and functions, getting function definitions, and
     executing functions.
 
@@ -42,7 +42,7 @@ class Aipolabs:
         api_key: str | None = None,
         base_url: str | httpx.URL | None = None,
     ) -> None:
-        """Create and initialize a new Aipolabs client.
+        """Create and initialize a new Aipolabs ACI client.
 
         Args:
             api_key: The API key to use for authentication.
@@ -52,13 +52,13 @@ class Aipolabs:
             If no value found for base_url, it will use the default value.
         """
         if api_key is None:
-            api_key = os.environ.get("AIPOLABS_API_KEY")
+            api_key = os.environ.get("AIPOLABS_ACI_API_KEY")
         if api_key is None:
             raise APIKeyNotFound("The API key is not found.")
         self.api_key = api_key
 
         if base_url is None:
-            base_url = os.environ.get("AIPOLABS_BASE_URL", DEFAULT_AIPOLABS_BASE_URL)
+            base_url = os.environ.get("AIPOLABS_ACI_SERVER_URL", DEFAULT_SERVER_URL)
         self.base_url = self._enforce_trailing_slash(httpx.URL(base_url))
         self.headers = {
             "Content-Type": "application/json",
@@ -70,7 +70,7 @@ class Aipolabs:
         self.apps = AppsResource(self.httpx_client)
         self.functions = FunctionsResource(self.httpx_client)
 
-    def __enter__(self) -> Aipolabs:
+    def __enter__(self) -> ACI:
         self.httpx_client.__enter__()
         return self
 
@@ -93,15 +93,15 @@ class Aipolabs:
         """Routes and executes function calls based on the function name.
         This can be a convenience function to handle function calls from LLM without you checking the function name.
 
-        It supports handling built-in meta functions (AIPOLABS_SEARCH_APPS, AIPOLABS_SEARCH_FUNCTIONS,
-        AIPOLABS_GET_FUNCTION_DEFINITION, AIPOLABS_EXECUTE_FUNCTION) and also handling executing third-party functions
+        It supports handling built-in meta functions (ACI_SEARCH_APPS, ACI_SEARCH_FUNCTIONS,
+        ACI_GET_FUNCTION_DEFINITION, ACI_EXECUTE_FUNCTION) and also handling executing third-party functions
         directly like BRAVE_SEARCH__WEB_SEARCH.
 
         Args:
             function_name: Name of the function to be called.
             function_arguments: Dictionary containing the input arguments for the function.
             linked_account_owner_id: To specify the end-user (account owner) on behalf of whom you want to execute functions
-            You need to first link corresponding account with the same owner id in the Aipolabs dashboard.
+            You need to first link corresponding account with the same owner id in the Aipolabs ACI dashboard.
             configured_only: If True, App and Function search will only return results from configured apps under your project.
             inference_provider: Decides the function definition format returned by 'functions.get_definition'
         Returns:
@@ -115,27 +115,27 @@ class Aipolabs:
             f"configured_only={configured_only}, "
             f"inference_provider={inference_provider}"
         )
-        if function_name == AipolabsSearchApps.NAME:
+        if function_name == ACISearchApps.NAME:
             apps = self.apps.search(**function_arguments, configured_only=configured_only)
 
             return [app.model_dump() for app in apps]
 
-        elif function_name == AipolabsSearchFunctions.NAME:
+        elif function_name == ACISearchFunctions.NAME:
             functions = self.functions.search(**function_arguments, configured_only=configured_only)
 
             return [function.model_dump() for function in functions]
 
-        elif function_name == AipolabsGetFunctionDefinition.NAME:
+        elif function_name == ACIGetFunctionDefinition.NAME:
             return self.functions.get_definition(
                 **function_arguments, inference_provider=inference_provider
             )
 
-        elif function_name == AipolabsExecuteFunction.NAME:
+        elif function_name == ACIExecuteFunction.NAME:
             # TODO: sometimes when using the fixed_tool approach llm most time doesn't put input arguments in the
-            # 'function_arguments' key as defined in AIPOLABS_EXECUTE_FUNCTION schema,
+            # 'function_arguments' key as defined in ACI_EXECUTE_FUNCTION schema,
             # so we need to handle that here. It is a bit hacky, we should improve this in the future
             # TODO: consider adding post processing to auto fix all common errors in llm generated input arguments
-            function_arguments = AipolabsExecuteFunction.wrap_function_arguments_if_not_present(
+            function_arguments = ACIExecuteFunction.wrap_function_arguments_if_not_present(
                 function_arguments
             )
             result = self.functions.execute(

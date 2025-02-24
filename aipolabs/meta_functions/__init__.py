@@ -1,11 +1,11 @@
-import aipolabs.meta_functions._aipolabs_execute_function as AipolabsExecuteFunction
-import aipolabs.meta_functions._aipolabs_get_function_definition as AipolabsGetFunctionDefinition
-import aipolabs.meta_functions._aipolabs_search_apps as AipolabsSearchApps
-import aipolabs.meta_functions._aipolabs_search_functions as AipolabsSearchFunctions
+import aipolabs.meta_functions._aci_execute_function as ACIExecuteFunction
+import aipolabs.meta_functions._aci_get_function_definition as ACIGetFunctionDefinition
+import aipolabs.meta_functions._aci_search_apps as ACISearchApps
+import aipolabs.meta_functions._aci_search_functions as ACISearchFunctions
 
 __all__ = [
-    "AipolabsSearchApps",
-    "AipolabsSearchFunctions",
-    "AipolabsGetFunctionDefinition",
-    "AipolabsExecuteFunction",
+    "ACISearchApps",
+    "ACISearchFunctions",
+    "ACIGetFunctionDefinition",
+    "ACIExecuteFunction",
 ]

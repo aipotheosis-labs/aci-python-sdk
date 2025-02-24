@@ -1,15 +1,15 @@
 import httpx
 import pytest
 
-from aipolabs import Aipolabs
-from aipolabs._constants import DEFAULT_AIPOLABS_BASE_URL
+from aipolabs import ACI
+from aipolabs._constants import DEFAULT_SERVER_URL
 from aipolabs._exceptions import APIKeyNotFound
 
 from .utils import MOCK_API_KEY, MOCK_BASE_URL
 
 
 def test_client_initialization() -> None:
-    client = Aipolabs(api_key=MOCK_API_KEY, base_url=MOCK_BASE_URL)
+    client = ACI(api_key=MOCK_API_KEY, base_url=MOCK_BASE_URL)
     assert client.api_key == MOCK_API_KEY
     assert client.base_url == httpx.URL(MOCK_BASE_URL)
     assert client.headers["x-api-key"] == MOCK_API_KEY
@@ -19,9 +19,9 @@ def test_client_initialization() -> None:
 
 def test_client_initialization_without_api_key() -> None:
     with pytest.raises(APIKeyNotFound):
-        Aipolabs(api_key=None, base_url=MOCK_BASE_URL)
+        ACI(api_key=None, base_url=MOCK_BASE_URL)
 
 
 def test_client_initialization_without_base_url() -> None:
-    client = Aipolabs(api_key=MOCK_API_KEY, base_url=None)
-    assert client.base_url == httpx.URL(DEFAULT_AIPOLABS_BASE_URL)
+    client = ACI(api_key=MOCK_API_KEY, base_url=None)
+    assert client.base_url == httpx.URL(DEFAULT_SERVER_URL)

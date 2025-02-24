@@ -1,9 +1,9 @@
 """
-This module defines the AIPOLABS_SEARCH_APPS meta function, which is used by LLM to search for
+This module defines the ACI_SEARCH_APPS meta function, which is used by LLM to search for
 relevant applications (which include a set of functions) that can help complete a task.
 """
 
-NAME = "AIPOLABS_SEARCH_APPS"
+NAME = "ACI_SEARCH_APPS"
 
 SCHEMA = {
     "type": "function",

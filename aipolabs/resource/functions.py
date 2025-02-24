@@ -101,7 +101,7 @@ class FunctionsResource(APIResource):
     def execute(
         self, function_name: str, function_arguments: dict, linked_account_owner_id: str
     ) -> FunctionExecutionResult:
-        """Executes a Aipolabs indexed function with the provided arguments.
+        """Executes a Aipolabs ACI indexed function with the provided arguments.
 
         Args:
             function_name: Name of the function to execute.
@@ -123,6 +123,7 @@ class FunctionsResource(APIResource):
         logger.info(f"Executing function with: {validated_params.model_dump()}")
         request_body = {
             "function_input": validated_params.function_arguments,
+            "linked_account_owner_id": validated_params.linked_account_owner_id,
         }
         response = self._httpx_client.post(
             f"functions/{validated_params.function_name}/execute",

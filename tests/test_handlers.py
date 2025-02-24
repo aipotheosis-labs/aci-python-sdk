@@ -1,19 +1,19 @@
 import httpx
 import respx
 
-from aipolabs import Aipolabs
+from aipolabs import ACI
 from aipolabs.meta_functions import (
-    AipolabsExecuteFunction,
-    AipolabsGetFunctionDefinition,
-    AipolabsSearchApps,
-    AipolabsSearchFunctions,
+    ACIExecuteFunction,
+    ACIGetFunctionDefinition,
+    ACISearchApps,
+    ACISearchFunctions,
 )
 
 from .utils import MOCK_BASE_URL, MOCK_LINKED_ACCOUNT_OWNER_ID
 
 
 @respx.mock
-def test_handle_function_call_search_apps(client: Aipolabs) -> None:
+def test_handle_function_call_search_apps(client: ACI) -> None:
     mock_response = [{"name": "Test App", "description": "Test Description"}]
 
     route = respx.get(f"{MOCK_BASE_URL}apps/search").mock(
@@ -21,7 +21,7 @@ def test_handle_function_call_search_apps(client: Aipolabs) -> None:
     )
 
     response = client.handle_function_call(
-        AipolabsSearchApps.NAME,
+        ACISearchApps.NAME,
         {"intent": "search apps"},
         linked_account_owner_id=MOCK_LINKED_ACCOUNT_OWNER_ID,
     )
@@ -30,7 +30,7 @@ def test_handle_function_call_search_apps(client: Aipolabs) -> None:
 
 
 @respx.mock
-def test_handle_function_call_search_functions(client: Aipolabs) -> None:
+def test_handle_function_call_search_functions(client: ACI) -> None:
     mock_response = [{"name": "Test Function", "description": "Test Description"}]
 
     route = respx.get(f"{MOCK_BASE_URL}functions/search").mock(
@@ -38,7 +38,7 @@ def test_handle_function_call_search_functions(client: Aipolabs) -> None:
     )
 
     response = client.handle_function_call(
-        AipolabsSearchFunctions.NAME,
+        ACISearchFunctions.NAME,
         {"app_names": ["TEST"], "intent": "search functions"},
         linked_account_owner_id=MOCK_LINKED_ACCOUNT_OWNER_ID,
     )
@@ -47,7 +47,7 @@ def test_handle_function_call_search_functions(client: Aipolabs) -> None:
 
 
 @respx.mock
-def test_handle_function_call_get_function_definition(client: Aipolabs) -> None:
+def test_handle_function_call_get_function_definition(client: ACI) -> None:
     function_arguments = {"function_name": "TEST_FUNCTION"}
     mock_response = {"function": {"name": "Test Function"}}
     # note: the function name for mock route here should be function_name in the function_arguments
@@ -56,7 +56,7 @@ def test_handle_function_call_get_function_definition(client: Aipolabs) -> None:
     ).mock(return_value=httpx.Response(200, json=mock_response))
 
     response = client.handle_function_call(
-        AipolabsGetFunctionDefinition.NAME,
+        ACIGetFunctionDefinition.NAME,
         function_arguments,
         linked_account_owner_id=MOCK_LINKED_ACCOUNT_OWNER_ID,
     )
@@ -66,7 +66,7 @@ def test_handle_function_call_get_function_definition(client: Aipolabs) -> None:
 
 
 @respx.mock
-def test_handle_function_call_meta_function_execution(client: Aipolabs) -> None:
+def test_handle_function_call_meta_function_execution(client: ACI) -> None:
     function_arguments = {
         "function_name": "BRAVE_SEARCH__WEB_SEARCH",
         "function_arguments": {"param1": "value1"},
@@ -78,7 +78,7 @@ def test_handle_function_call_meta_function_execution(client: Aipolabs) -> None:
     ).mock(return_value=httpx.Response(200, json=mock_response))
 
     response = client.handle_function_call(
-        AipolabsExecuteFunction.NAME,
+        ACIExecuteFunction.NAME,
         function_arguments,
         linked_account_owner_id=MOCK_LINKED_ACCOUNT_OWNER_ID,
     )
@@ -87,7 +87,7 @@ def test_handle_function_call_meta_function_execution(client: Aipolabs) -> None:
 
 
 @respx.mock
-def test_handle_function_call_direct_indexed_function_execution(client: Aipolabs) -> None:
+def test_handle_function_call_direct_indexed_function_execution(client: ACI) -> None:
     function_name = "BRAVE_SEARCH__WEB_SEARCH"
     function_arguments = {"query": "test"}
     mock_response = {

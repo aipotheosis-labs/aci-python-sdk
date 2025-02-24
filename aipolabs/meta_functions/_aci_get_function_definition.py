@@ -1,5 +1,5 @@
 """
-This module defines the AIPOLABS_GET_FUNCTION_DEFINITION meta function, which is used by LLM to retrieve
+This module defines the ACI_GET_FUNCTION_DEFINITION meta function, which is used by LLM to retrieve
 the definition of an executable function.
 
 The function requires one key parameter:
@@ -8,7 +8,7 @@ The function requires one key parameter:
 It returns json schema of the function definition.
 """
 
-NAME = "AIPOLABS_GET_FUNCTION_DEFINITION"
+NAME = "ACI_GET_FUNCTION_DEFINITION"
 
 SCHEMA = {
     "type": "function",
@@ -20,7 +20,7 @@ SCHEMA = {
             "properties": {
                 "function_name": {
                     "type": "string",
-                    "description": "The name of the function you want to get the definition for. You can get function names by using the AIPOLABS_SEARCH_FUNCTIONS function.",
+                    "description": "The name of the function you want to get the definition for. You can get function names by using the ACI_SEARCH_FUNCTIONS function.",
                 }
             },
             "required": ["function_name"],
