@@ -135,5 +135,5 @@ There are mainly two ways to use the platform with the meta functions:
 - **Fully Autonomous**: Provide all 4 meta functions to the LLM, please see the [agent_with_dynamic_function_discovery_and_fixed_tools.py](./examples/agent_with_dynamic_function_discovery_and_fixed_tools.py) for more details.
 - **Semi Autonomous**: Provide all but `ACIExecuteFunction` to the LLM, and use the Unified Function Calling Handler to execute functions, please see the [agent_with_dynamic_function_discovery_and_dynamic_tools.py](./examples/agent_with_dynamic_function_discovery_and_dynamic_tools.py) for more details.
 
-Please also see [agent_with_preplanned_tools.py](./examples/agent_with_preplanned_tools.py) for comparison where the specific functions are pre selected and provided to the LLM.
+Please also see [agent_with_preplanned_tools.py](./examples/agent_with_pre_planned_tools.py) for comparison where the specific functions are pre selected and provided to the LLM.
 
