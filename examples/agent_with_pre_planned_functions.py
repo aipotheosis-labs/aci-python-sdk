@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 from aipolabs import ACI
-from aipolabs.types.functions import Function, InferenceProvider
+from aipolabs.types.functions import InferenceProvider
 from aipolabs.utils._logging import create_headline
 
 load_dotenv()
@@ -20,9 +20,8 @@ aci = ACI()
 
 
 def main() -> None:
-    brave_search_function_definition = aci.functions.get_definition(
-        Function.BRAVE_SEARCH__WEB_SEARCH
-    )
+    # For a list of all supported apps and functions, please go to the platform.aci.dev
+    brave_search_function_definition = aci.functions.get_definition("BRAVE_SEARCH__WEB_SEARCH")
 
     print(create_headline("Brave search function definition"))
     print(brave_search_function_definition)
