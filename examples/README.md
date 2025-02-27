@@ -6,7 +6,7 @@ This directory contains example implementations demonstrating different approach
 
 ### 1. Agent with Pre-planned Functions
 
-[agent_with_pre_planned_functions.py](./agent_with_pre_planned_functions.py)
+[agent_with_pre_planned_tools.py](./agent_with_pre_planned_tools.py)
 
 This example demonstrates the simplest way to use Aipolabs ACI functions with an LLM agent. It:
 - Pre-selects specific functions by developers before the conversation
@@ -40,4 +40,4 @@ The examples are runnable, for a quick setup:
 - Set your OpenAI API key (set as `OPENAI_API_KEY` in your environment)
 - Set your Aipolabs ACI API key (set as `AIPOLABS_ACI_API_KEY` in your environment)
 - Change the `linked_account_owner_id` in the `handle_function_call` method to your own account owner id (need to be linked in the [Aipolabs ACI platform](https://platform.aci.dev) first)
-- Run any example: `poetry run python examples/agent_with_pre_planned_functions.py`
+- Run any example: `poetry run python examples/agent_with_pre_planned_tools.py`
