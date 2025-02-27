@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "aipolabs"
-version = "0.0.1-beta.3"
+version = "0.0.1-beta.4"
 description = "The official Python SDK for the ACI API by Aipolabs (Aipotheosis Labs)"
 authors = ["Aipolabs <team@aipolabs.xyz>"]
 readme = "README.md"
