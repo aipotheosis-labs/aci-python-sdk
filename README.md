@@ -46,7 +46,7 @@ from aipolabs.types.apps import App, AppDetails
 # all parameters are optional
 apps: list[App] = client.apps.search(
     intent="I want to search the web",
-    configured_only=True,
+    allowed_apps_only=False, # If true, only return apps that are allowed by the agent/accessor, identified by the api key.
     categories=["search"],
     limit=10,
     offset=0
@@ -71,7 +71,7 @@ from aipolabs.types.functions import Function, FunctionExecutionResult, Inferenc
 functions: list[Function] = client.functions.search(
     app_names=["BRAVE_SEARCH", "TAVILY"],
     intent="I want to search the web",
-    configured_only=True,
+    allowed_apps_only=False, # If true, only returns functions of apps that are allowed by the agent/accessor, identified by the api key.
     limit=10,
     offset=0
 )
@@ -125,7 +125,7 @@ result = client.handle_function_call(
     tool_call.function.name,
     json.loads(tool_call.function.arguments),
     linked_account_owner_id="john_doe",
-    configured_only=True,
+    allowed_apps_only=True,
     inference_provider=InferenceProvider.OPENAI
 )
 ```

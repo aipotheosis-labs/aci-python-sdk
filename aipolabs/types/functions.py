@@ -56,7 +56,7 @@ class SearchFunctionsParams(BaseModel):
 
     app_names: list[str] | None = None
     intent: str | None = None
-    configured_only: bool = False
+    allowed_apps_only: bool = False
     limit: int | None = None
     offset: int | None = None
 

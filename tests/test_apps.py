@@ -14,7 +14,7 @@ from .utils import MOCK_BASE_URL
         {},  # Base case: No optional parameters provided.
         {  # All optional parameters provided.
             "intent": "test",
-            "configured_only": True,
+            "allowed_apps_only": True,
             "categories": ["utility", "education"],
             "limit": 10,
             "offset": 5,

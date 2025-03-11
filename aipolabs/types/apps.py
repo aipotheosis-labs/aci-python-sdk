@@ -11,7 +11,7 @@ class SearchAppsParams(BaseModel):
     """
 
     intent: str | None = None
-    configured_only: bool = False
+    allowed_apps_only: bool = False
     categories: list[str] | None = None
     limit: int | None = None
     offset: int | None = None

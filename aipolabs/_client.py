@@ -87,7 +87,7 @@ class ACI:
         function_name: str,
         function_arguments: dict,
         linked_account_owner_id: str,
-        configured_only: bool = False,
+        allowed_apps_only: bool = False,
         inference_provider: InferenceProvider = InferenceProvider.OPENAI,
     ) -> Any:
         """Routes and executes function calls based on the function name.
@@ -102,7 +102,7 @@ class ACI:
             function_arguments: Dictionary containing the input arguments for the function.
             linked_account_owner_id: To specify the end-user (account owner) on behalf of whom you want to execute functions
             You need to first link corresponding account with the same owner id in the Aipolabs ACI dashboard.
-            configured_only: If True, App and Function search will only return results from configured apps under your project.
+            allowed_apps_only: If true, only returns functions/apps that are allowed to be used by the agent/accessor, identified by the api key.
             inference_provider: Decides the function definition format returned by 'functions.get_definition'
         Returns:
             Any: The result (serializable) of the function execution. It varies based on the function.
@@ -112,16 +112,18 @@ class ACI:
             f"name={function_name}, "
             f"params={function_arguments}, "
             f"linked_account_owner_id={linked_account_owner_id}, "
-            f"configured_only={configured_only}, "
+            f"allowed_apps_only={allowed_apps_only}, "
             f"inference_provider={inference_provider}"
         )
         if function_name == ACISearchApps.NAME:
-            apps = self.apps.search(**function_arguments, configured_only=configured_only)
+            apps = self.apps.search(**function_arguments, allowed_apps_only=allowed_apps_only)
 
             return [app.model_dump() for app in apps]
 
         elif function_name == ACISearchFunctions.NAME:
-            functions = self.functions.search(**function_arguments, configured_only=configured_only)
+            functions = self.functions.search(
+                **function_arguments, allowed_apps_only=allowed_apps_only
+            )
 
             return [function.model_dump() for function in functions]
 

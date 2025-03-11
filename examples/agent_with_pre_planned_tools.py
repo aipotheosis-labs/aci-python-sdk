@@ -55,15 +55,17 @@ def main() -> None:
             tool_call.function.name,
             json.loads(tool_call.function.arguments),
             linked_account_owner_id=LINKED_ACCOUNT_OWNER_ID,
-            configured_only=True,
+            allowed_apps_only=True,
             inference_provider=InferenceProvider.OPENAI,
         )
-        # alternatively, because this is a direct function execution you can use the following:
-        # result = aci.functions.execute(
-        #     tool_call.function.name,
-        #     json.loads(tool_call.function.arguments),
-        #     linked_account_owner_id=LINKED_ACCOUNT_OWNER_ID,
-        # )
+        """
+        alternatively, because this is a direct function execution you can use the following:
+        result = aci.functions.execute(
+            tool_call.function.name,
+            json.loads(tool_call.function.arguments),
+            linked_account_owner_id=LINKED_ACCOUNT_OWNER_ID,
+        )
+        """
         print(f"{create_headline('Function Call Result')} \n {result}")
 
 

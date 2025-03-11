@@ -39,5 +39,8 @@ The examples are runnable, for a quick setup:
 - Clone the whole repository and install dependencies `poetry install`
 - Set your OpenAI API key (set as `OPENAI_API_KEY` in your environment)
 - Set your Aipolabs ACI API key (set as `AIPOLABS_ACI_API_KEY` in your environment)
-- Change the `linked_account_owner_id` in the `handle_function_call` method to your own account owner id (need to be linked in the [Aipolabs ACI platform](https://platform.aci.dev) first)
+- Configure app `BRAVE_SEARCH` in the [Aipolabs ACI platform](https://platform.aci.dev)
+- Allow the Apps (e.g., `BRAVE_SEARCH`) to be used by your `agent` in the [Aipolabs ACI platform](https://platform.aci.dev)
+- Link an `BRAVE_SEARCH` account (need to get the api key from [brave](https://brave.com/search/api/)) in the [Aipolabs ACI platform](https://platform.aci.dev)
+- Set the `LINKED_ACCOUNT_OWNER_ID` environment variable to your owner id of the linked account you just created.
 - Run any example: `poetry run python examples/agent_with_pre_planned_tools.py`
