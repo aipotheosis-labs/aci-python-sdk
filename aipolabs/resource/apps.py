@@ -14,7 +14,7 @@ class AppsResource(APIResource):
     def search(
         self,
         intent: str | None = None,
-        configured_only: bool = False,
+        allowed_apps_only: bool = False,
         categories: list[str] | None = None,
         limit: int | None = None,
         offset: int | None = None,
@@ -23,7 +23,7 @@ class AppsResource(APIResource):
 
         Args:
             intent: search results will be sorted by relevance to this intent.
-            configured_only: if True, only apps that have been configured in the current project will be returned.
+            allowed_apps_only: If true, only return apps that are allowed by the agent/accessor, identified by the api key.
             categories: list of categories to filter apps by.
             limit: for pagination, maximum number of apps to return.
             offset: for pagination, number of apps to skip before returning results.
@@ -36,7 +36,7 @@ class AppsResource(APIResource):
         """
         validated_params = SearchAppsParams(
             intent=intent,
-            configured_only=configured_only,
+            allowed_apps_only=allowed_apps_only,
             categories=categories,
             limit=limit,
             offset=offset,

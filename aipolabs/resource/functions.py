@@ -25,7 +25,7 @@ class FunctionsResource(APIResource):
         self,
         app_names: list[str] | None = None,
         intent: str | None = None,
-        configured_only: bool = False,
+        allowed_apps_only: bool = False,
         limit: int | None = None,
         offset: int | None = None,
     ) -> list[Function]:
@@ -34,7 +34,7 @@ class FunctionsResource(APIResource):
         Args:
             app_names: List of app names to filter functions by.
             intent: search results will be sorted by relevance to this intent.
-            configured_only: if True, only functions whose App has been configured in the current project will be returned.
+            allowed_apps_only: If true, only returns functions of apps that are allowed by the agent/accessor, identified by the api key.
             limit: for pagination, maximum number of functions to return.
             offset: for pagination, number of functions to skip before returning results.
 
@@ -47,7 +47,7 @@ class FunctionsResource(APIResource):
         validated_params = SearchFunctionsParams(
             app_names=app_names,
             intent=intent,
-            configured_only=configured_only,
+            allowed_apps_only=allowed_apps_only,
             limit=limit,
             offset=offset,
         ).model_dump(exclude_none=True)

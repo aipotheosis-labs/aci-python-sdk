@@ -83,7 +83,7 @@ def main() -> None:
                 tool_call.function.name,
                 json.loads(tool_call.function.arguments),
                 linked_account_owner_id=LINKED_ACCOUNT_OWNER_ID,
-                configured_only=True,
+                allowed_apps_only=True,
                 inference_provider=InferenceProvider.OPENAI,
             )
 
