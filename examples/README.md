@@ -44,3 +44,4 @@ The examples are runnable, for a quick setup:
 - Link an `BRAVE_SEARCH` account (need to get the api key from [brave](https://brave.com/search/api/)) in the [Aipolabs ACI platform](https://platform.aci.dev)
 - Set the `LINKED_ACCOUNT_OWNER_ID` environment variable to your owner id of the linked account you just created.
 - Run any example: `poetry run python examples/agent_with_pre_planned_tools.py`
+- You might need to repeat the above steps for other examples of they use different apps.

@@ -37,16 +37,17 @@ client = ACI(
 ### Apps
 #### Types
 ```python
-from aipolabs.types.apps import App, AppDetails
+from aipolabs.types.apps import AppBasic, AppDetails
 ```
 
 #### Methods
 ```python
 # search for apps, returns list of basic app data, sorted by relevance to the intent
 # all parameters are optional
-apps: list[App] = client.apps.search(
+apps: list[AppBasic] = client.apps.search(
     intent="I want to search the web",
     allowed_apps_only=False, # If true, only return apps that are allowed by the agent/accessor, identified by the api key.
+    include_functions=False, # If true, include functions (name and description) in the search results.
     categories=["search"],
     limit=10,
     offset=0
@@ -61,17 +62,18 @@ app_details: AppDetails = client.apps.get(app_name="BRAVE_SEARCH")
 ### Functions
 #### Types
 ```python
-from aipolabs.types.functions import Function, FunctionExecutionResult, InferenceProvider
+from aipolabs.types.functions import FunctionExecutionResult, FunctionDefinitionFormat
 ```
 
 #### Methods
 ```python
 # search for functions, returns list of basic function data, sorted by relevance to the intent
 # all parameters are optional
-functions: list[Function] = client.functions.search(
+functions: list[dict] = client.functions.search(
     app_names=["BRAVE_SEARCH", "TAVILY"],
     intent="I want to search the web",
     allowed_apps_only=False, # If true, only returns functions of apps that are allowed by the agent/accessor, identified by the api key.
+    format=FunctionDefinitionFormat.OPENAI, # The format of the functions, can be OPENAI, ANTHROPIC, BASIC (name and description only)
     limit=10,
     offset=0
 )
@@ -79,10 +81,10 @@ functions: list[Function] = client.functions.search(
 
 ```python
 # get function definition of a specific function, this is the schema you can feed into LLM
-# the actual format is defined by the inference provider
+# the actual format is defined by the format parameter: OPENAI, ANTHROPIC, BASIC (name and description only)
 function_definition: dict = client.functions.get_definition(
     function_name="BRAVE_SEARCH__WEB_SEARCH",
-    inference_provider=InferenceProvider.OPENAI
+    format=FunctionDefinitionFormat.OPENAI
 )
 ```
 
@@ -126,7 +128,7 @@ result = client.handle_function_call(
     json.loads(tool_call.function.arguments),
     linked_account_owner_id="john_doe",
     allowed_apps_only=True,
-    inference_provider=InferenceProvider.OPENAI
+    format=FunctionDefinitionFormat.OPENAI
 )
 ```
 

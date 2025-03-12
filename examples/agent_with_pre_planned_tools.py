@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 
 from aipolabs import ACI
-from aipolabs.types.functions import InferenceProvider
+from aipolabs.types.functions import FunctionDefinitionFormat
 from aipolabs.utils._logging import create_headline
 
 load_dotenv()
@@ -56,7 +56,7 @@ def main() -> None:
             json.loads(tool_call.function.arguments),
             linked_account_owner_id=LINKED_ACCOUNT_OWNER_ID,
             allowed_apps_only=True,
-            inference_provider=InferenceProvider.OPENAI,
+            format=FunctionDefinitionFormat.OPENAI,
         )
         """
         alternatively, because this is a direct function execution you can use the following:
