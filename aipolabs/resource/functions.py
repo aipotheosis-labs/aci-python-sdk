@@ -52,7 +52,7 @@ class FunctionsResource(APIResource):
             format=format,
             limit=limit,
             offset=offset,
-        ).model_dump(exclude_none=True)
+        ).model_dump(exclude_none=True, mode="json")
 
         logger.info(f"Searching functions with params: {validated_params}")
         response = self._httpx_client.get(

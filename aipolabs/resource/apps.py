@@ -43,7 +43,7 @@ class AppsResource(APIResource):
             categories=categories,
             limit=limit,
             offset=offset,
-        ).model_dump(exclude_none=True)
+        ).model_dump(exclude_none=True, mode="json")
 
         logger.info(f"Searching apps with params: {validated_params}")
         response = self._httpx_client.get(
