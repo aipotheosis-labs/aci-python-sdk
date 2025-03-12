@@ -18,7 +18,7 @@ class SearchAppsParams(BaseModel):
     offset: int | None = None
 
 
-class App(BaseModel):
+class AppBasic(BaseModel):
     """Representation of an application. Search results will return a list of these."""
 
     # instance attributes should match the schema defined on the server side.
@@ -28,9 +28,7 @@ class App(BaseModel):
 
 
 class AppDetails(BaseModel):
-    """Detailed representation of an application, returned by App.get().
-    Includes all base App fields plus functions supported by the app.
-    """
+    """Detailed representation of an application, returned by App.get()."""
 
     id: str
     name: str

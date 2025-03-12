@@ -37,16 +37,17 @@ client = ACI(
 ### Apps
 #### Types
 ```python
-from aipolabs.types.apps import App, AppDetails
+from aipolabs.types.apps import AppBasic, AppDetails
 ```
 
 #### Methods
 ```python
 # search for apps, returns list of basic app data, sorted by relevance to the intent
 # all parameters are optional
-apps: list[App] = client.apps.search(
+apps: list[AppBasic] = client.apps.search(
     intent="I want to search the web",
     allowed_apps_only=False, # If true, only return apps that are allowed by the agent/accessor, identified by the api key.
+    include_functions=False, # If true, include functions (name and description) in the search results.
     categories=["search"],
     limit=10,
     offset=0
