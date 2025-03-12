@@ -15,6 +15,7 @@ class AppsResource(APIResource):
         self,
         intent: str | None = None,
         allowed_apps_only: bool = False,
+        include_functions: bool = False,
         categories: list[str] | None = None,
         limit: int | None = None,
         offset: int | None = None,
@@ -24,6 +25,7 @@ class AppsResource(APIResource):
         Args:
             intent: search results will be sorted by relevance to this intent.
             allowed_apps_only: If true, only return apps that are allowed by the agent/accessor, identified by the api key.
+            include_functions: If true, include functions (name and description) in the search results.
             categories: list of categories to filter apps by.
             limit: for pagination, maximum number of apps to return.
             offset: for pagination, number of apps to skip before returning results.
@@ -37,6 +39,7 @@ class AppsResource(APIResource):
         validated_params = SearchAppsParams(
             intent=intent,
             allowed_apps_only=allowed_apps_only,
+            include_functions=include_functions,
             categories=categories,
             limit=limit,
             offset=offset,

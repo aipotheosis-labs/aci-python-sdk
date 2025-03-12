@@ -67,3 +67,17 @@ class Function(BaseModel):
 
     name: str
     description: str
+
+
+class FunctionDetails(BaseModel):
+    id: str
+    app_name: str
+    name: str
+    description: str
+    tags: list[str]
+    visibility: str
+    active: bool
+    protocol: str
+    protocol_data: dict
+    parameters: dict
+    response: dict
