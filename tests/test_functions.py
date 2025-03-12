@@ -31,6 +31,7 @@ MOCK_FUNCTION_ARGUMENTS = {"param1": "value1", "param2": "value2"}
             "app_names": ["TEST"],
             "intent": "test",
             "allowed_apps_only": True,
+            "format": FunctionDefinitionFormat.OPENAI,
             "limit": 10,
             "offset": 0,
         },
@@ -44,7 +45,7 @@ def test_search_functions_success(client: ACI, search_params: dict) -> None:
     )
 
     functions = client.functions.search(**search_params)
-    assert [function.model_dump() for function in functions] == mock_response
+    assert functions == mock_response
     assert route.call_count == 1, "should not retry"
 
 

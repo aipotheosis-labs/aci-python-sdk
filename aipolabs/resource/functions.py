@@ -30,6 +30,7 @@ class FunctionsResource(APIResource):
         offset: int | None = None,
     ) -> list[dict]:
         """Searches for functions.
+        # TODO: return specific pydantic model for returned functions based on FunctionDefinitionFormat
 
         Args:
             app_names: List of app names to filter functions by.
@@ -68,6 +69,7 @@ class FunctionsResource(APIResource):
         self, function_name: str, format: FunctionDefinitionFormat = FunctionDefinitionFormat.OPENAI
     ) -> dict:
         """Retrieves the definition of a specific function.
+        # TODO: return specific pydantic model for returned functions based on FunctionDefinitionFormat
 
         Args:
             function_name: Name of the function to retrieve.

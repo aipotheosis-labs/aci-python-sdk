@@ -118,14 +118,14 @@ class ACI:
         if function_name == ACISearchApps.NAME:
             apps = self.apps.search(**function_arguments, allowed_apps_only=allowed_apps_only)
 
-            return [app.model_dump() for app in apps]
+            return [app.model_dump(exclude_none=True) for app in apps]
 
         elif function_name == ACISearchFunctions.NAME:
             functions = self.functions.search(
                 **function_arguments, allowed_apps_only=allowed_apps_only
             )
 
-            return [function.model_dump() for function in functions]
+            return functions
 
         elif function_name == ACIGetFunctionDefinition.NAME:
             return self.functions.get_definition(**function_arguments, format=format)
