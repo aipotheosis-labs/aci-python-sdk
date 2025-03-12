@@ -4,20 +4,21 @@ from typing import Any
 from pydantic import BaseModel
 
 
-class InferenceProvider(str, Enum):
-    OPENAI = "openai"
-    ANTHROPIC = "anthropic"
+class FunctionDefinitionFormat(str, Enum):
+    BASIC = "basic"  # name and description only
+    OPENAI = "openai"  # openai function call format
+    ANTHROPIC = "anthropic"  # anthropic function call format
 
 
 class GetFunctionDefinitionParams(BaseModel):
     """Parameters for getting a function definition.
 
-    The backend requires "inference_provider" parameter but this value should be set by the
-    developer and not LLM when using the sdk, so the 'inference_provider' parameter is not present in meta SCHEMA.
+    The backend requires "format" parameter but this value should be set by the
+    developer and not LLM when using the sdk, so the 'format' parameter is not present in meta SCHEMA.
     """
 
     function_name: str
-    inference_provider: InferenceProvider
+    format: FunctionDefinitionFormat
 
 
 class FunctionExecutionParams(BaseModel):

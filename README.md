@@ -61,7 +61,7 @@ app_details: AppDetails = client.apps.get(app_name="BRAVE_SEARCH")
 ### Functions
 #### Types
 ```python
-from aipolabs.types.functions import Function, FunctionExecutionResult, InferenceProvider
+from aipolabs.types.functions import Function, FunctionExecutionResult, FunctionDefinitionFormat
 ```
 
 #### Methods
@@ -79,10 +79,10 @@ functions: list[Function] = client.functions.search(
 
 ```python
 # get function definition of a specific function, this is the schema you can feed into LLM
-# the actual format is defined by the inference provider
+# the actual format is defined by the format parameter: OPENAI, ANTHROPIC, BASIC (name and description only)
 function_definition: dict = client.functions.get_definition(
     function_name="BRAVE_SEARCH__WEB_SEARCH",
-    inference_provider=InferenceProvider.OPENAI
+    format=FunctionDefinitionFormat.OPENAI
 )
 ```
 
@@ -126,7 +126,7 @@ result = client.handle_function_call(
     json.loads(tool_call.function.arguments),
     linked_account_owner_id="john_doe",
     allowed_apps_only=True,
-    inference_provider=InferenceProvider.OPENAI
+    format=FunctionDefinitionFormat.OPENAI
 )
 ```
 

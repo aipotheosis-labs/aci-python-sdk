@@ -17,7 +17,7 @@ from aipolabs.meta_functions import (
 )
 from aipolabs.resource.apps import AppsResource
 from aipolabs.resource.functions import FunctionsResource
-from aipolabs.types.functions import InferenceProvider
+from aipolabs.types.functions import FunctionDefinitionFormat
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -88,7 +88,7 @@ class ACI:
         function_arguments: dict,
         linked_account_owner_id: str,
         allowed_apps_only: bool = False,
-        inference_provider: InferenceProvider = InferenceProvider.OPENAI,
+        format: FunctionDefinitionFormat = FunctionDefinitionFormat.OPENAI,
     ) -> Any:
         """Routes and executes function calls based on the function name.
         This can be a convenience function to handle function calls from LLM without you checking the function name.
@@ -103,7 +103,7 @@ class ACI:
             linked_account_owner_id: To specify the end-user (account owner) on behalf of whom you want to execute functions
             You need to first link corresponding account with the same owner id in the Aipolabs ACI dashboard.
             allowed_apps_only: If true, only returns functions/apps that are allowed to be used by the agent/accessor, identified by the api key.
-            inference_provider: Decides the function definition format returned by 'functions.get_definition'
+            format: Decides the function definition format returned by 'functions.get_definition' and 'functions.search'
         Returns:
             Any: The result (serializable) of the function execution. It varies based on the function.
         """
@@ -113,7 +113,7 @@ class ACI:
             f"params={function_arguments}, "
             f"linked_account_owner_id={linked_account_owner_id}, "
             f"allowed_apps_only={allowed_apps_only}, "
-            f"inference_provider={inference_provider}"
+            f"format={format}"
         )
         if function_name == ACISearchApps.NAME:
             apps = self.apps.search(**function_arguments, allowed_apps_only=allowed_apps_only)
@@ -128,9 +128,7 @@ class ACI:
             return [function.model_dump() for function in functions]
 
         elif function_name == ACIGetFunctionDefinition.NAME:
-            return self.functions.get_definition(
-                **function_arguments, inference_provider=inference_provider
-            )
+            return self.functions.get_definition(**function_arguments, format=format)
 
         elif function_name == ACIExecuteFunction.NAME:
             # TODO: sometimes when using the fixed_tool approach llm most time doesn't put input arguments in the

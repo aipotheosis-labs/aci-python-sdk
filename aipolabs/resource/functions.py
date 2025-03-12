@@ -6,10 +6,10 @@ from tenacity import retry
 from aipolabs.resource._base import APIResource, retry_config
 from aipolabs.types.functions import (
     Function,
+    FunctionDefinitionFormat,
     FunctionExecutionParams,
     FunctionExecutionResult,
     GetFunctionDefinitionParams,
-    InferenceProvider,
     SearchFunctionsParams,
 )
 
@@ -65,32 +65,30 @@ class FunctionsResource(APIResource):
 
     @retry(**retry_config)
     def get_definition(
-        self, function_name: str, inference_provider: InferenceProvider = InferenceProvider.OPENAI
+        self, function_name: str, format: FunctionDefinitionFormat = FunctionDefinitionFormat.OPENAI
     ) -> dict:
         """Retrieves the definition of a specific function.
 
         Args:
             function_name: Name of the function to retrieve.
-            inference_provider: Decide the function definition format based on the inference provider.
+            format: Decide the function definition format.
 
         Returns:
-            # TODO: specific pydantic model for returned function definition based on inference provider
-            dict: JSON schema that defines the function, varies based on the inference provider.
+            # TODO: specific pydantic model for returned function definition based on FunctionDefinitionFormat
+            dict: JSON schema that defines the function, varies based on the FunctionDefinitionFormat.
 
         Raises:
             Various exceptions defined in _handle_response for different HTTP status codes.
         """
-        validated_params = GetFunctionDefinitionParams(
-            function_name=function_name, inference_provider=inference_provider
-        )
+        validated_params = GetFunctionDefinitionParams(function_name=function_name, format=format)
 
         logger.info(
             f"Getting function definition of {validated_params.function_name}, "
-            f"inference provider: {validated_params.inference_provider}"
+            f"format: {validated_params.format}"
         )
         response = self._httpx_client.get(
             f"functions/{validated_params.function_name}/definition",
-            params={"inference_provider": validated_params.inference_provider.value},
+            params={"format": validated_params.format.value},
         )
 
         function_definition: dict = self._handle_response(response)

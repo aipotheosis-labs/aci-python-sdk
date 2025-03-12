@@ -13,7 +13,7 @@ from aipolabs._exceptions import (
     UnknownError,
     ValidationError,
 )
-from aipolabs.types.functions import InferenceProvider
+from aipolabs.types.functions import FunctionDefinitionFormat
 
 from .utils import MOCK_BASE_URL
 
@@ -50,10 +50,10 @@ def test_search_functions_success(client: ACI, search_params: dict) -> None:
 
 @respx.mock
 @pytest.mark.parametrize(
-    "inference_provider, mock_response",
+    "format, mock_response",
     [
         (
-            InferenceProvider.OPENAI,
+            FunctionDefinitionFormat.OPENAI,
             {
                 "type": "function",
                 "function": {
@@ -64,7 +64,7 @@ def test_search_functions_success(client: ACI, search_params: dict) -> None:
             },
         ),
         (
-            InferenceProvider.ANTHROPIC,
+            FunctionDefinitionFormat.ANTHROPIC,
             {
                 "name": "function_name",
                 "description": "function_description",
@@ -74,14 +74,14 @@ def test_search_functions_success(client: ACI, search_params: dict) -> None:
     ],
 )
 def test_get_function_definition_success(
-    client: ACI, inference_provider: InferenceProvider, mock_response: dict
+    client: ACI, format: FunctionDefinitionFormat, mock_response: dict
 ) -> None:
     route = respx.get(
         f"{MOCK_BASE_URL}functions/{MOCK_FUNCTION_NAME}/definition",
-        params={"inference_provider": inference_provider.value},
+        params={"format": format.value},
     ).mock(return_value=httpx.Response(200, json=mock_response))
 
-    response = client.functions.get_definition(MOCK_FUNCTION_NAME, inference_provider)
+    response = client.functions.get_definition(MOCK_FUNCTION_NAME, format)
     assert response == mock_response
     assert route.call_count == 1, "should not retry"
 
