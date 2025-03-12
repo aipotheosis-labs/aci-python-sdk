@@ -5,7 +5,6 @@ from tenacity import retry
 
 from aipolabs.resource._base import APIResource, retry_config
 from aipolabs.types.functions import (
-    Function,
     FunctionDefinitionFormat,
     FunctionExecutionParams,
     FunctionExecutionResult,
@@ -26,9 +25,10 @@ class FunctionsResource(APIResource):
         app_names: list[str] | None = None,
         intent: str | None = None,
         allowed_apps_only: bool = False,
+        format: FunctionDefinitionFormat = FunctionDefinitionFormat.OPENAI,
         limit: int | None = None,
         offset: int | None = None,
-    ) -> list[Function]:
+    ) -> list[dict]:
         """Searches for functions.
 
         Args:
@@ -39,8 +39,8 @@ class FunctionsResource(APIResource):
             offset: for pagination, number of functions to skip before returning results.
 
         Returns:
-            list[Function]: List of functions matching the search criteria in the order of relevance.
-
+            list[dict]: List of functions matching the search criteria in the order of relevance.
+            The format of the functions is determined by the FunctionDefinitionFormat.
         Raises:
             Various exceptions defined in _handle_response for different HTTP status codes.
         """
@@ -48,6 +48,7 @@ class FunctionsResource(APIResource):
             app_names=app_names,
             intent=intent,
             allowed_apps_only=allowed_apps_only,
+            format=format,
             limit=limit,
             offset=offset,
         ).model_dump(exclude_none=True)
@@ -59,9 +60,8 @@ class FunctionsResource(APIResource):
         )
 
         data: list[dict] = self._handle_response(response)
-        functions = [Function.model_validate(function) for function in data]
 
-        return functions
+        return data
 
     @retry(**retry_config)
     def get_definition(

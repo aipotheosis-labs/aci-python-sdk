@@ -62,17 +62,18 @@ app_details: AppDetails = client.apps.get(app_name="BRAVE_SEARCH")
 ### Functions
 #### Types
 ```python
-from aipolabs.types.functions import Function, FunctionExecutionResult, FunctionDefinitionFormat
+from aipolabs.types.functions import FunctionExecutionResult, FunctionDefinitionFormat
 ```
 
 #### Methods
 ```python
 # search for functions, returns list of basic function data, sorted by relevance to the intent
 # all parameters are optional
-functions: list[Function] = client.functions.search(
+functions: list[dict] = client.functions.search(
     app_names=["BRAVE_SEARCH", "TAVILY"],
     intent="I want to search the web",
     allowed_apps_only=False, # If true, only returns functions of apps that are allowed by the agent/accessor, identified by the api key.
+    format=FunctionDefinitionFormat.OPENAI, # The format of the functions, can be OPENAI, ANTHROPIC, BASIC (name and description only)
     limit=10,
     offset=0
 )

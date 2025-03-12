@@ -58,12 +58,12 @@ class SearchFunctionsParams(BaseModel):
     app_names: list[str] | None = None
     intent: str | None = None
     allowed_apps_only: bool = False
+    format: FunctionDefinitionFormat = FunctionDefinitionFormat.OPENAI
     limit: int | None = None
     offset: int | None = None
 
 
 class Function(BaseModel):
-    """Representation of a function. Search results will return a list of these."""
 
     name: str
     description: str
