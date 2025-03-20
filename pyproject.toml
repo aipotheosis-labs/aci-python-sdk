@@ -2,7 +2,7 @@
 name = "aipolabs"
 version = "0.0.1-beta.5"
 description = "The official Python SDK for the ACI API by Aipolabs (Aipotheosis Labs)"
-authors = ["Aipolabs <team@aipolabs.xyz>"]
+authors = ["Aipolabs <support@aipolabs.xyz>"]
 readme = "README.md"
 homepage = "https://aci.dev"
 repository = "https://github.com/aipotheosis-labs/aipolabs-python"
