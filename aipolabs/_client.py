@@ -14,6 +14,7 @@ from aipolabs.meta_functions import (
     ACIGetFunctionDefinition,
     ACISearchApps,
     ACISearchFunctions,
+    ACISearchFunctionsWithIntent,
 )
 from aipolabs.resource.apps import AppsResource
 from aipolabs.resource.functions import FunctionsResource
@@ -120,7 +121,10 @@ class ACI:
 
             return [app.model_dump(exclude_none=True) for app in apps]
 
-        elif function_name == ACISearchFunctions.NAME:
+        elif (
+            function_name == ACISearchFunctions.NAME
+            or function_name == ACISearchFunctionsWithIntent.NAME
+        ):
             functions = self.functions.search(
                 **function_arguments,
                 allowed_apps_only=allowed_apps_only,
