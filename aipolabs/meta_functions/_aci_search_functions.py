@@ -17,7 +17,7 @@ SCHEMA = {
                 "app_names": {
                     "type": "array",
                     "items": {"type": "string"},
-                    "description": "The names of the apps you want to search functions for If provided, the search will be limited to the functions of the specified apps. Use null to search functions across all apps. You can find app names by first using the ACI_SEARCH_APPS function.",
+                    "description": "The names of the apps you want to search functions for. If provided, the search will be limited to the functions of the specified apps. Use null to search functions across all apps. You can find app names by first using the ACI_SEARCH_APPS function.",
                 },
                 "intent": {
                     "type": "string",
@@ -26,7 +26,7 @@ SCHEMA = {
                 "limit": {
                     "type": "integer",
                     "default": 100,
-                    "description": "The maximum number of apps to return from the search.",
+                    "description": "The maximum number of functions to return from the search per response.",
                     "minimum": 1,
                     "maximum": 1000,
                 },
