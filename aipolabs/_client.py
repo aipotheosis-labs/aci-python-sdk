@@ -122,7 +122,9 @@ class ACI:
 
         elif function_name == ACISearchFunctions.NAME:
             functions = self.functions.search(
-                **function_arguments, allowed_apps_only=allowed_apps_only
+                **function_arguments,
+                allowed_apps_only=allowed_apps_only,
+                format=format,
             )
 
             return functions

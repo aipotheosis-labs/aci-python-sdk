@@ -27,7 +27,7 @@ def main() -> None:
     print(brave_search_function_definition)
 
     response = openai.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-4o",
         messages=[
             {
                 "role": "system",
