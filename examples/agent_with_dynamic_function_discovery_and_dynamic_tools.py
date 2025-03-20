@@ -45,7 +45,7 @@ def main() -> None:
     while True:
         print(create_headline("Waiting for LLM Output"))
         response = openai.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-4o",
             messages=[
                 {
                     "role": "system",
