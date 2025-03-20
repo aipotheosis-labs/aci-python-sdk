@@ -52,7 +52,7 @@ def main() -> None:
                 },
                 {
                     "role": "user",
-                    "content": "Can you search online for some information about aipolabs ACI? Use whichever search tool you find most suitable for the task via the ACI meta functions.",
+                    "content": "Can you use brave search to find top 5 results about aipolabs ACI?",
                 },
             ]
             + chat_history,
