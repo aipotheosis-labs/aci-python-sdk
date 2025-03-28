@@ -6,9 +6,7 @@ authors = ["Aipolabs <support@aipolabs.xyz>"]
 readme = "README.md"
 homepage = "https://aci.dev"
 repository = "https://github.com/aipotheosis-labs/aipolabs-python"
-packages = [
-    { include = "aipolabs", from = "." }
-]
+packages = [{ include = "aipolabs", from = "." }]
 classifiers = [
     "Typing :: Typed",
     "Development Status :: 4 - Beta",
@@ -28,7 +26,7 @@ classifiers = [
 python = "^3.10"
 pydantic = "^2.9.2"
 typing-extensions = "^4.12.0"
-httpx = "^0.27.2"
+httpx = ">=0.27.2,<1"
 tenacity = "^9.0.0"
 
 [tool.poetry.group.dev.dependencies]
