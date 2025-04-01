@@ -7,9 +7,10 @@ validating the execution parameters.
 """
 
 import aipolabs.meta_functions._aci_get_function_definition as ACIGetFunctionDefinition
+from aipolabs.types.functions import BaseFunctionSchema
 
 NAME = "ACI_EXECUTE_FUNCTION"
-SCHEMA = {
+SCHEMA: BaseFunctionSchema = {
     "type": "function",
     "function": {
         "name": NAME,

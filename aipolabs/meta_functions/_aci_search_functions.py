@@ -4,9 +4,10 @@ relevant executable functions that can help complete a task.
 
 You can filter by adding app names, which can be retrieved using the ACI_SEARCH_APPS meta function.
 """
+from aipolabs.types.functions import BaseFunctionSchema
 
 NAME = "ACI_SEARCH_FUNCTIONS"
-SCHEMA = {
+SCHEMA: BaseFunctionSchema = {
     "type": "function",
     "function": {
         "name": NAME,

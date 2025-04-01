@@ -2,10 +2,11 @@
 This module defines the ACI_SEARCH_APPS meta function, which is used by LLM to search for
 relevant applications (which include a set of functions) that can help complete a task.
 """
+from aipolabs.types.functions import BaseFunctionSchema
 
 NAME = "ACI_SEARCH_APPS"
 
-SCHEMA = {
+SCHEMA: BaseFunctionSchema = {
     "type": "function",
     "function": {
         "name": NAME,

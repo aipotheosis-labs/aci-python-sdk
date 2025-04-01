@@ -5,9 +5,10 @@ relevant executable functions that can help complete a task.
 This function is similar to ACI_SEARCH_FUNCTIONS, but it removes the app_names parameter for a
 simplified workflow (Otherwise you'd have to call ACI_SEARCH_APPS first to get the app names).
 """
+from aipolabs.types.functions import BaseFunctionSchema
 
 NAME = "ACI_SEARCH_FUNCTIONS_WITH_INTENT"
-SCHEMA = {
+SCHEMA: BaseFunctionSchema = {
     "type": "function",
     "function": {
         "name": NAME,

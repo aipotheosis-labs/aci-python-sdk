@@ -7,10 +7,11 @@ The function requires one key parameter:
 
 It returns json schema of the function definition.
 """
+from aipolabs.types.functions import BaseFunctionSchema
 
 NAME = "ACI_GET_FUNCTION_DEFINITION"
 
-SCHEMA = {
+SCHEMA: BaseFunctionSchema = {
     "type": "function",
     "function": {
         "name": NAME,

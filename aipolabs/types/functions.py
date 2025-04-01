@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any
+from typing import Any, TypedDict, Literal, Union
 
 from pydantic import BaseModel
 
@@ -64,7 +64,6 @@ class SearchFunctionsParams(BaseModel):
 
 
 class Function(BaseModel):
-
     name: str
     description: str
 
@@ -81,3 +80,21 @@ class FunctionDetails(BaseModel):
     protocol_data: dict
     parameters: dict
     response: dict
+
+
+class BaseFunctionParameters(TypedDict):
+    properties: dict[str, dict[str, Union[str, int, bool]]]
+    type: Literal["object"]
+    required: list[str]
+    additionalProperties: bool
+
+
+class BaseFunction(TypedDict):
+    name: str
+    description: str
+    parameters: BaseFunctionParameters
+
+
+class BaseFunctionSchema(TypedDict):
+    type: Literal["function"]
+    function: BaseFunction
