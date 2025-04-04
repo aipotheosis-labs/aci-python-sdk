@@ -22,7 +22,7 @@ poetry add aipolabs
 ```
 
 ## Usage
-Aipolabs ACI platform is built with agent-first principles. Although you can call each of the APIs below any way you prefer in your application, we strongly recommend trying the [Agent-centric features](#agent-centric-features) and taking a look at the [examples](./examples/README.md) to get the most out of the platform and to enable the full potential and vision of future agentic applications.
+Aipolabs ACI platform is built with agent-first principles. Although you can call each of the APIs below any way you prefer in your application, we strongly recommend trying the [Agent-centric features](#agent-centric-features) and taking a look at the [agent examples](https://github.com/aipotheosis-labs/aipolabs-agents/tree/main/examples) to get the most out of the platform and to enable the full potential and vision of future agentic applications.
 
 ### Client
 ```python
