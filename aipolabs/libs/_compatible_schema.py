@@ -142,7 +142,9 @@ def _ensure_llm_compatible_json_schema(
     # so we unravel the ref
     # `{"type": "string", "description": "my description"}`
     ref = json_schema.get("$ref")
-    if ref and has_more_than_n_keys(json_schema, 1):
+    # NOTE: opinionated change: we expand refs regardless of the number of keys. previously, we only expanded refs
+    # if there was only one key in the json schema. (has_more_than_n_keys(json_schema, 1))
+    if ref:
         assert isinstance(ref, str), f"Received non-string $ref - {ref}"
 
         resolved = resolve_ref(root=root, ref=ref)

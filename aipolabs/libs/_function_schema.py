@@ -306,6 +306,9 @@ def function_schema(
     # 'strict' mode in openai
     json_schema = ensure_llm_compatible_json_schema(json_schema)
 
+    # 4.2 NOTE: opinionated change: pop the '$defs' key from the json schema (we can safely do this because we expand all 'refs')
+    json_schema.pop("$defs")
+
     # 5. Return as a FuncSchema dataclass
     return FuncSchema(
         name=func_name,
