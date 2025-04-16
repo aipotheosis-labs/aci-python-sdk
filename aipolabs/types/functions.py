@@ -6,7 +6,10 @@ from pydantic import BaseModel
 
 class FunctionDefinitionFormat(str, Enum):
     BASIC = "basic"  # name and description only
-    OPENAI = "openai"  # openai function call format
+    OPENAI = "openai"  # openai function call format (for the chat completions api)
+    OPENAI_RESPONSES = (
+        "openai_responses"  # openai function call format (for the responses api, the newest API)
+    )
     ANTHROPIC = "anthropic"  # anthropic function call format
 
 
