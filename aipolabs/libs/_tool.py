@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from typing import Any, Callable, Dict, Literal, Optional, TypedDict, Union, overload
+from typing import Any, Callable, Optional
+
+from aipolabs.types.functions import FunctionDefinitionFormat
 
 from ._function_schema import DocstringStyle, function_schema
 
@@ -11,63 +13,24 @@ It is used to convert a Python function to an LLM tool schema in the specified f
 """
 
 
-# Schema format types
-SchemaFormat = Literal["openai", "anthropic"]
-
-
-# Schema type definitions
-class OpenAISchema(TypedDict):
-    type: Literal["function"]
-    name: str
-    description: str
-    parameters: Dict[str, Any]
-
-
-class AnthropicSchema(TypedDict):
-    name: str
-    description: str
-    input_schema: Dict[str, Any]
-
-
-@overload
 def to_json_schema(
     func: Callable[..., Any],
-    format: Literal["openai"],
+    format: FunctionDefinitionFormat,
     *,
     name_override: Optional[str] = None,
     description_override: Optional[str] = None,
     docstring_style: Optional[DocstringStyle] = None,
     use_docstring_info: bool = True,
-) -> OpenAISchema: ...
-
-
-@overload
-def to_json_schema(
-    func: Callable[..., Any],
-    format: Literal["anthropic"],
-    *,
-    name_override: Optional[str] = None,
-    description_override: Optional[str] = None,
-    docstring_style: Optional[DocstringStyle] = None,
-    use_docstring_info: bool = True,
-) -> AnthropicSchema: ...
-
-
-def to_json_schema(
-    func: Callable[..., Any],
-    format: SchemaFormat = "openai",
-    *,
-    name_override: Optional[str] = None,
-    description_override: Optional[str] = None,
-    docstring_style: Optional[DocstringStyle] = None,
-    use_docstring_info: bool = True,
-) -> Union[OpenAISchema, AnthropicSchema]:
+) -> dict:
     """
     Convert a Python function to an LLM tool schema in the specified format.
 
     Args:
         func: The function to convert to a schema
-        format: The schema format to generate ("openai" or "anthropic")
+        format: The schema format to generate, one of the following:
+            - FunctionDefinitionFormat.OPENAI: for openai chat completions api
+            - FunctionDefinitionFormat.OPENAI_RESPONSES: for openai responses api
+            - FunctionDefinitionFormat.ANTHROPIC: for anthropic api
         name_override: Optional custom name for the function
         description_override: Optional custom description
         docstring_style: Optional docstring style for parsing
@@ -81,8 +44,9 @@ def to_json_schema(
         ...     '''Get current temperature for a location.'''
         ...     return f"Weather information for {location}"
         ...
-        >>> openai_schema = to_llm_schema(get_weather, "openai")
-        >>> anthropic_schema = to_llm_schema(get_weather, "anthropic")
+        >>> openai_schema = to_llm_schema(get_weather, FunctionDefinitionFormat.OPENAI)
+        >>> openai_responses_schema = to_llm_schema(get_weather, FunctionDefinitionFormat.OPENAI_RESPONSES)
+        >>> anthropic_schema = to_llm_schema(get_weather, FunctionDefinitionFormat.ANTHROPIC)
     """
     # Extract base function metadata
     base_schema = function_schema(
@@ -94,14 +58,23 @@ def to_json_schema(
     )
 
     # Generate schema based on format
-    if format == "openai":
+    if format == FunctionDefinitionFormat.OPENAI:
+        return {
+            "type": "function",
+            "function": {
+                "name": base_schema.name,
+                "description": base_schema.description or "",
+                "parameters": base_schema.params_json_schema,
+            },
+        }
+    elif format == FunctionDefinitionFormat.OPENAI_RESPONSES:
         return {
             "type": "function",
             "name": base_schema.name,
             "description": base_schema.description or "",
             "parameters": base_schema.params_json_schema,
         }
-    elif format == "anthropic":
+    elif format == FunctionDefinitionFormat.ANTHROPIC:
         return {
             "name": base_schema.name,
             "description": base_schema.description or "",
