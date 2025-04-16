@@ -102,6 +102,75 @@ else:
     print(result.error)
 ```
 
+### Utility functions
+#### to_json_schema
+Convert a local python function to a LLM compatible tool schema, so you can use custom functions (tools) along with ACI.dev functions (tools).
+```python
+from aipolabs import to_json_schema
+
+# dummy function to test the schema conversion
+def custom_function(
+    required_int: int,
+    optional_str_with_default: str = "default string",
+) -> None:
+    """This is a test function.
+
+    Args:
+        required_int: This is required_int.
+        optional_str_with_default: This is optional_str_with_default.
+    """
+    pass
+
+# for openai chat completions api
+custom_function_openai_chat_completions = to_json_schema(custom_function, FunctionDefinitionFormat.OPENAI)
+"""result:
+{
+    "type": "function",
+    "function": {
+        "name": "custom_function",
+        "description": "This is a test function.",
+        "parameters": {
+            "properties": {
+                "required_int": {
+                    "description": "This is required_int.",
+                    "title": "Required Int",
+                    "type": "integer"
+                },
+                "optional_str_with_default": {
+                    "default": "default string",
+                    "description": "This is optional_str_with_default.",
+                    "title": "Optional Str With Default",
+                    "type": "string"
+                }
+            },
+            "required": ["required_int"],
+            "title": "custom_function_args",
+            "type": "object",
+            "additionalProperties": False
+        }
+    }
+}
+"""
+
+# alternative format: for openai responses api
+custom_function_openai_responses = to_json_schema(custom_function, FunctionDefinitionFormat.OPENAI_RESPONSES)
+
+# alternative format: for anthropic api
+custom_function_anthropic = to_json_schema(custom_function, FunctionDefinitionFormat.ANTHROPIC)
+
+# use the tool in a openai chat completion api
+response = openai.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {
+            "role": "system",
+            "content": "You are a helpful assistant with access to a variety of tools.",
+        },
+    ],
+    tools=[custom_function_openai_chat_completions]
+)
+```
+
 ### Agent-centric features
 The SDK provides a suite of features and helper functions to make it easier and more seamless to use functions in LLM powered agentic applications.
 This is our vision and the recommended way of trying out the SDK.
