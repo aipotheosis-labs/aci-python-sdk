@@ -62,7 +62,7 @@ app_details: AppDetails = client.apps.get(app_name="BRAVE_SEARCH")
 ### App Configurations
 #### Types
 ```python
-from aipolabs.types.app_configurations import AppConfigurationPublic
+from aipolabs.types.app_configurations import AppConfiguration
 from aipolabs.types.enums import SecurityScheme
 ```
 
@@ -78,7 +78,7 @@ configuration = client.app_configurations.create(
 ```python
 # List app configurations
 # All parameters are optional
-configurations: list[AppConfigurationPublic] = client.app_configurations.list(
+configurations: list[AppConfiguration] = client.app_configurations.list(
     app_names=["GMAIL", "BRAVE_SEARCH"],  # Filter by app names
     limit=10,  # Maximum number of results
     offset=0   # Pagination offset
@@ -87,7 +87,7 @@ configurations: list[AppConfigurationPublic] = client.app_configurations.list(
 
 ```python
 # Get app configuration by app name
-configuration: AppConfigurationPublic = client.app_configurations.get(app_name="GMAIL")
+configuration: AppConfiguration = client.app_configurations.get(app_name="GMAIL")
 ```
 
 

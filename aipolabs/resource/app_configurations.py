@@ -5,8 +5,8 @@ from tenacity import retry
 
 from aipolabs.resource._base import APIResource, retry_config
 from aipolabs.types.app_configurations import (
+    AppConfiguration,
     AppConfigurationCreate,
-    AppConfigurationPublic,
     AppConfigurationsList,
 )
 from aipolabs.types.enums import SecurityScheme
@@ -23,7 +23,7 @@ class AppConfigurationsResource(APIResource):
         app_names: list[str] | None = None,
         limit: int | None = None,
         offset: int | None = None,
-    ) -> List[AppConfigurationPublic]:
+    ) -> List[AppConfiguration]:
         """List app configurations.
 
         Args:
@@ -32,7 +32,7 @@ class AppConfigurationsResource(APIResource):
             offset: Pagination offset.
 
         Returns:
-            List[AppConfigurationPublic]: List of app configurations.
+            List[AppConfiguration]: List of app configurations.
 
         Raises:
             Various exceptions defined in _handle_response for different HTTP status codes.
@@ -50,18 +50,18 @@ class AppConfigurationsResource(APIResource):
         )
 
         data: List[dict] = self._handle_response(response)
-        app_configurations = [AppConfigurationPublic.model_validate(config) for config in data]
+        app_configurations = [AppConfiguration.model_validate(config) for config in data]
         return app_configurations
 
     @retry(**retry_config)
-    def get(self, app_name: str) -> AppConfigurationPublic:
+    def get(self, app_name: str) -> AppConfiguration:
         """Get an app configuration by app name.
 
         Args:
             app_name: Name of the app to get configuration for.
 
         Returns:
-            AppConfigurationPublic: The app configuration.
+            AppConfiguration: The app configuration.
 
         Raises:
             Various exceptions defined in _handle_response for different HTTP status codes.
@@ -69,7 +69,7 @@ class AppConfigurationsResource(APIResource):
         logger.info(f"Getting app configuration for app: {app_name}")
         response = self._httpx_client.get(f"app-configurations/{app_name}")
         data: dict = self._handle_response(response)
-        app_configuration = AppConfigurationPublic.model_validate(data)
+        app_configuration = AppConfiguration.model_validate(data)
 
         return app_configuration  # type: ignore
 
@@ -78,7 +78,7 @@ class AppConfigurationsResource(APIResource):
         self,
         app_name: str,
         security_scheme: SecurityScheme,
-    ) -> AppConfigurationPublic:
+    ) -> AppConfiguration:
         """Create an app configuration.
 
         Args:
@@ -86,7 +86,7 @@ class AppConfigurationsResource(APIResource):
             security_scheme: Security scheme to use for the app configuration.
 
         Returns:
-            AppConfigurationPublic: The created app configuration.
+            AppConfiguration: The created app configuration.
 
         Raises:
             Various exceptions defined in _handle_response for different HTTP status codes.
@@ -108,7 +108,7 @@ class AppConfigurationsResource(APIResource):
         )
         data: dict = self._handle_response(response)
 
-        return AppConfigurationPublic.model_validate(data)  # type: ignore
+        return AppConfiguration.model_validate(data)  # type: ignore
 
     @retry(**retry_config)
     def delete(self, app_name: str) -> None:

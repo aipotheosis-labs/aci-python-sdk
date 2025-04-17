@@ -6,7 +6,7 @@ import pytest
 import respx
 
 from aipolabs import ACI
-from aipolabs.types.app_configurations import AppConfigurationPublic
+from aipolabs.types.app_configurations import AppConfiguration
 from aipolabs.types.enums import SecurityScheme
 
 from .utils import MOCK_BASE_URL
@@ -71,7 +71,7 @@ def test_get_app_configuration_success(client: ACI) -> None:
     )
 
     app_config = client.app_configurations.get(app_name)
-    assert isinstance(app_config, AppConfigurationPublic)
+    assert isinstance(app_config, AppConfiguration)
     assert app_config.app_name == app_name
     assert route.call_count == 1, "should not retry"
 
@@ -111,7 +111,7 @@ def test_create_app_configuration_success(client: ACI) -> None:
         all_functions_enabled,
         enabled_functions,
     )
-    assert isinstance(app_config, AppConfigurationPublic)
+    assert isinstance(app_config, AppConfiguration)
     assert app_config.app_name == app_name
     assert app_config.security_scheme == security_scheme
     assert route.call_count == 1, "should not retry"

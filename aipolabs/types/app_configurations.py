@@ -6,7 +6,7 @@ from pydantic import BaseModel, ConfigDict
 from aipolabs.types.enums import SecurityScheme
 
 
-class AppConfigurationPublic(BaseModel):
+class AppConfiguration(BaseModel):
     """Public representation of an app configuration."""
 
     id: UUID
