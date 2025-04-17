@@ -16,6 +16,7 @@ from aipolabs.meta_functions import (
     ACISearchFunctions,
     ACISearchFunctionsWithIntent,
 )
+from aipolabs.resource.app_configurations import AppConfigurationsResource
 from aipolabs.resource.apps import AppsResource
 from aipolabs.resource.functions import FunctionsResource
 from aipolabs.types.functions import FunctionDefinitionFormat
@@ -70,6 +71,7 @@ class ACI:
         # Initialize resource clients
         self.apps = AppsResource(self.httpx_client)
         self.functions = FunctionsResource(self.httpx_client)
+        self.app_configurations = AppConfigurationsResource(self.httpx_client)
 
     def __enter__(self) -> ACI:
         self.httpx_client.__enter__()
