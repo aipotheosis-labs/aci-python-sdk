@@ -59,6 +59,43 @@ apps: list[AppBasic] = client.apps.search(
 app_details: AppDetails = client.apps.get(app_name="BRAVE_SEARCH")
 ```
 
+### App Configurations
+#### Types
+```python
+from aipolabs.types.app_configurations import AppConfigurationPublic
+from aipolabs.types.enums import SecurityScheme
+```
+
+#### Methods
+```python
+# Create a new app configuration
+configuration = client.app_configurations.create(
+    app_name="GMAIL",
+    security_scheme=SecurityScheme.OAUTH2
+)
+```
+
+```python
+# List app configurations
+# All parameters are optional
+configurations: list[AppConfigurationPublic] = client.app_configurations.list(
+    app_names=["GMAIL", "BRAVE_SEARCH"],  # Filter by app names
+    limit=10,  # Maximum number of results
+    offset=0   # Pagination offset
+)
+```
+
+```python
+# Get app configuration by app name
+configuration: AppConfigurationPublic = client.app_configurations.get(app_name="GMAIL")
+```
+
+
+```python
+# Delete an app configuration
+client.app_configurations.delete(app_name="GMAIL")
+```
+
 ### Functions
 #### Types
 ```python
