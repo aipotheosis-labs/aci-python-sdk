@@ -76,26 +76,21 @@ def test_get_app_configuration_success(client: ACI) -> None:
     assert route.call_count == 1, "should not retry"
 
 
+# TODO: add coverage for security_scheme_overrides, all_functions_enabled, enabled_functions
 @respx.mock
 def test_create_app_configuration_success(client: ACI) -> None:
     app_name = "test_app"
     security_scheme = SecurityScheme.OAUTH2
-    security_scheme_overrides = {
-        "client_id": "test_client_id",
-        "client_secret": "test_client_secret",
-    }
-    all_functions_enabled = True
-    enabled_functions: list[str] = []
 
     mock_response = {
         "id": str(uuid.uuid4()),
         "project_id": str(uuid.uuid4()),
         "app_name": app_name,
         "security_scheme": security_scheme,
-        "security_scheme_overrides": security_scheme_overrides,
+        "security_scheme_overrides": {},
         "enabled": True,
-        "all_functions_enabled": all_functions_enabled,
-        "enabled_functions": enabled_functions,
+        "all_functions_enabled": True,
+        "enabled_functions": [],
         "created_at": datetime.now().isoformat(),
         "updated_at": datetime.now().isoformat(),
     }
@@ -107,9 +102,6 @@ def test_create_app_configuration_success(client: ACI) -> None:
     app_config = client.app_configurations.create(
         app_name,
         security_scheme,
-        security_scheme_overrides,
-        all_functions_enabled,
-        enabled_functions,
     )
     assert isinstance(app_config, AppConfiguration)
     assert app_config.app_name == app_name
