@@ -1,11 +1,11 @@
-# Aipolabs ACI Python SDK
+# ACI Python SDK (BY AIPOLABS)
 
-[![PyPI version](https://img.shields.io/pypi/v/aipolabs.svg)](https://pypi.org/project/aipolabs/)
+[![PyPI version](https://img.shields.io/pypi/v/aci-sdk.svg)](https://pypi.org/project/aci-sdk/)
 
-The official Python SDK for the Aipolabs ACI API.
+The official Python SDK for the ACI API.
 Currently in private beta, breaking changes are expected.
 
-The Aipolabs ACI Python SDK provides convenient access to the Aipolabs ACI REST API from any Python 3.10+
+The ACI Python SDK provides convenient access to the ACI REST API from any Python 3.10+
 application.
 
 ## Documentation
@@ -13,31 +13,31 @@ The REST API documentation is available [here](https://docs.aci.dev/api-referenc
 
 ## Installation
 ```bash
-pip install aipolabs
+pip install aci-sdk
 ```
 
-or with poetry:
+or with uv:
 ```bash
-poetry add aipolabs
+uv add aci-sdk
 ```
 
 ## Usage
-Aipolabs ACI platform is built with agent-first principles. Although you can call each of the APIs below any way you prefer in your application, we strongly recommend trying the [Agent-centric features](#agent-centric-features) and taking a look at the [agent examples](https://github.com/aipotheosis-labs/aipolabs-agents/tree/main/examples) to get the most out of the platform and to enable the full potential and vision of future agentic applications.
+ACI platform is built with agent-first principles. Although you can call each of the APIs below any way you prefer in your application, we strongly recommend trying the [Agent-centric features](#agent-centric-features) and taking a look at the [agent examples](https://github.com/aipotheosis-labs/aci-agents/tree/main/examples) to get the most out of the platform and to enable the full potential and vision of future agentic applications.
 
 ### Client
 ```python
-from aipolabs import ACI
+from aci import ACI
 
 client = ACI(
     # it reads from environment variable by default so you can omit it if you set it in your environment
-    api_key=os.environ.get("AIPOLABS_ACI_API_KEY")
+    api_key=os.environ.get("ACI_API_KEY")
 )
 ```
 
 ### Apps
 #### Types
 ```python
-from aipolabs.types.apps import AppBasic, AppDetails
+from aci.types.apps import AppBasic, AppDetails
 ```
 
 #### Methods
@@ -62,8 +62,8 @@ app_details: AppDetails = client.apps.get(app_name="BRAVE_SEARCH")
 ### App Configurations
 #### Types
 ```python
-from aipolabs.types.app_configurations import AppConfiguration
-from aipolabs.types.enums import SecurityScheme
+from aci.types.app_configurations import AppConfiguration
+from aci.types.enums import SecurityScheme
 ```
 
 #### Methods
@@ -99,7 +99,7 @@ client.app_configurations.delete(app_name="GMAIL")
 ### Functions
 #### Types
 ```python
-from aipolabs.types.functions import FunctionExecutionResult, FunctionDefinitionFormat
+from aci.types.functions import FunctionExecutionResult, FunctionDefinitionFormat
 ```
 
 #### Methods
@@ -143,7 +143,7 @@ else:
 #### to_json_schema
 Convert a local python function to a LLM compatible tool schema, so you can use custom functions (tools) along with ACI.dev functions (tools).
 ```python
-from aipolabs import to_json_schema
+from aci import to_json_schema
 
 # dummy function to test the schema conversion
 def custom_function(
@@ -216,7 +216,7 @@ This is our vision and the recommended way of trying out the SDK.
 We provide 4 meta functions that can be used with LLMs as tools directly, and a unified handler for function calls. With these the LLM can discover apps and functions (that our platform supports) and execute them autonomously.
 
 ```python
-from aipolabs import meta_functions
+from aci import meta_functions
 
 # meta functions
 tools = [
@@ -238,5 +238,4 @@ result = client.handle_function_call(
 )
 ```
 
-There are mainly two ways to use the platform with the meta functions, please see [agent patterns](https://github.com/aipotheosis-labs/aipolabs-agents?tab=readme-ov-file#2-agent-with-dynamic-tool-discovery-and-execution)
-
+There are mainly two ways to use the platform with the meta functions, please see [agent patterns](https://github.com/aipotheosis-labs/aci-agents?tab=readme-ov-file#2-agent-with-dynamic-tool-discovery-and-execution)
