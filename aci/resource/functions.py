@@ -102,7 +102,7 @@ class FunctionsResource(APIResource):
     def execute(
         self, function_name: str, function_arguments: dict, linked_account_owner_id: str
     ) -> FunctionExecutionResult:
-        """Executes a Aipolabs ACI indexed function with the provided arguments.
+        """Executes a ACI indexed functions (tools) with the provided arguments.
 
         Args:
             function_name: Name of the function to execute.

@@ -1,6 +1,6 @@
 """
 This module defines the ACI_EXECUTE_FUNCTION meta function, which is used by LLM to submit
-execution requests for indexed functions on aipolabs ACI backend.
+execution requests for indexed functions on ACI backend.
 
 This module includes the schema definition for the function and a Pydantic model for
 validating the execution parameters.

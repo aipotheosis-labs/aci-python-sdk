@@ -26,9 +26,9 @@ logger: logging.Logger = logging.getLogger(__name__)
 
 
 class ACI:
-    """Client for interacting with the Aipolabs ACI API.
+    """Client for interacting with the ACI API.
 
-    This class provides methods to interact with various Aipolabs ACI endpoints,
+    This class provides methods to interact with various ACI backend endpoints,
     including searching apps and functions, getting function definitions, and
     executing functions.
 
@@ -45,7 +45,7 @@ class ACI:
         api_key: str | None = None,
         base_url: str | httpx.URL | None = None,
     ) -> None:
-        """Create and initialize a new Aipolabs ACI client.
+        """Create and initialize a new ACI client.
 
         Args:
             api_key: The API key to use for authentication.
@@ -61,7 +61,7 @@ class ACI:
         self.api_key = api_key
 
         if base_url is None:
-            base_url = os.environ.get("AIPOLABS_ACI_SERVER_URL", DEFAULT_SERVER_URL)
+            base_url = os.environ.get("ACI_SERVER_URL", DEFAULT_SERVER_URL)
         self.base_url = self._enforce_trailing_slash(httpx.URL(base_url))
         self.headers = {
             "Content-Type": "application/json",
@@ -106,7 +106,7 @@ class ACI:
             function_name: Name of the function to be called.
             function_arguments: Dictionary containing the input arguments for the function.
             linked_account_owner_id: To specify the end-user (account owner) on behalf of whom you want to execute functions
-            You need to first link corresponding account with the same owner id in the Aipolabs ACI dashboard.
+            You need to first link corresponding account with the same owner id in the ACI dashboard (https://platform.aci.dev).
             allowed_apps_only: If true, only returns functions/apps that are allowed to be used by the agent/accessor, identified by the api key.
             format: Decides the function definition format returned by 'functions.get_definition' and 'functions.search'
         Returns:
@@ -155,7 +155,7 @@ class ACI:
 
         else:
             # If the function name is not a meta function, we assume it is a direct function execution of
-            # an aipolabs indexed function
+            # an ACI indexed function
             # TODO: check function exist if not throw excpetion?
             result = self.functions.execute(
                 function_name, function_arguments, linked_account_owner_id
