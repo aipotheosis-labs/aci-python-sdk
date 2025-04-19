@@ -9,7 +9,7 @@ The ACI Python SDK provides convenient access to the ACI REST API from any Pytho
 application.
 
 ## Documentation
-The Detailed documentation is available [here](https://aci.dev/docs).
+The detailed documentation is available [here](https://aci.dev/docs).
 
 ## Installation
 ```bash
