@@ -43,7 +43,7 @@ class FunctionExecutionParams(BaseModel):
 
 
 class FunctionExecutionResult(BaseModel):
-    """Result of a Aipolabs ACI indexed function (e.g. "BRAVE_SEARCH__WEB_SEARCH") execution.
+    """Result of a ACI indexed function (tools) (e.g. "BRAVE_SEARCH__WEB_SEARCH") execution.
     Should be identical to the class defined on server side.
     """
 

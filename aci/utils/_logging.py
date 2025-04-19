@@ -6,7 +6,7 @@ from typing_extensions import override
 
 from aci.utils._type_check import is_dict
 
-logger: logging.Logger = logging.getLogger("aipolabs")
+logger: logging.Logger = logging.getLogger("ACI")
 httpx_logger: logging.Logger = logging.getLogger("httpx")
 
 

@@ -100,7 +100,7 @@ class APIResource:
             return str(error)
 
 
-# Shared retry config for all requests to the Aipolabs ACI API
+# Shared retry config for all requests to the ACI backend APIs
 retry_config = {
     "stop": stop_after_attempt(DEFAULT_MAX_RETRIES),
     "wait": wait_exponential(

@@ -1,16 +1,56 @@
-name: SDK Checks
+name: ACI Python SDK CI Workflow
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 9 * * *"
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install Dependencies with uv
+        run: |
+          uv sync --all-extras --dev
+
+      - name: Run Ruff Linting
+        run: |
+          uv run ruff check .
+
+      - name: Run Ruff Formatting
+        run: |
+          uv run ruff format . --diff
+
+      - name: Run Mypy Type Checking
+        run: |
+          uv run mypy .
+
+
   build:
+    name: Build & Test
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"] # Specify desired Python versions
+        python-version: ["3.10", "3.13"]
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
