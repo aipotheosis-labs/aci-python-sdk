@@ -1,4 +1,4 @@
-name: SDK CI Pipeline
+name: ACI Python SDK CI Workflow
 
 on:
   push:
@@ -42,6 +42,7 @@ jobs:
 
 
   build:
+    name: Build & Test
     runs-on: ubuntu-latest
     strategy:
       matrix:
