@@ -1,15 +1,15 @@
-# ACI Python SDK (BY AIPOLABS)
+# ACI Python SDK
 
 [![PyPI version](https://img.shields.io/pypi/v/aci-sdk.svg)](https://pypi.org/project/aci-sdk/)
 
-The official Python SDK for the ACI API.
-Currently in private beta, breaking changes are expected.
+The official Python SDK for the ACI (Agent-Computer Interface) by Aipolabs.
+Currently in beta, breaking changes are expected.
 
 The ACI Python SDK provides convenient access to the ACI REST API from any Python 3.10+
 application.
 
 ## Documentation
-The REST API documentation is available [here](https://docs.aci.dev/api-reference).
+The Detailed documentation is available [here](https://aci.dev/docs).
 
 ## Installation
 ```bash
