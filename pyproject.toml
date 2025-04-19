@@ -94,4 +94,6 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["aci"]
-force-include = [{ "aci/py.typed" = "aci/py.typed" }]
+
+[tool.hatch.build.targets.wheel.force-include]
+"aci/py.typed" = "aci/py.typed"

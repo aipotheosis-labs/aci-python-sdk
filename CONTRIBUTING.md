@@ -6,14 +6,6 @@ we use uv to manage dependencies and build the package.
 # Install uv if you don't have it already
 curl -sSf https://install.pypa.io/get-pip.py | python3 -
 pip install uv
-
-# run unit tests
-uv run pytest tests/unit
-
-# run integration tests
-export ACI_API_KEY=<your-api-key>
-export LINKED_ACCOUNT_OWNER_ID=<your-linked-account-owner-id>
-uv run pytest tests/it
 ```
 
 ### Coding style
@@ -34,8 +26,19 @@ uv run pytest tests/it
       }
       ```
 
-### Build and publish the package
+### Run tests
 
+```bash
+# run unit tests
+uv run pytest tests/unit
+
+# run integration tests
+export ACI_API_KEY=<your-api-key>
+export LINKED_ACCOUNT_OWNER_ID=<your-linked-account-owner-id>
+uv run pytest tests/it
+```
+
+### Build and publish the package
 ```bash
 uv sync
 uv build
