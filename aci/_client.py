@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import os
 from types import TracebackType
-from typing import Any, Optional, Type
+from typing import Any
 
 import httpx
 
@@ -19,6 +19,7 @@ from aci.meta_functions import (
 from aci.resource.app_configurations import AppConfigurationsResource
 from aci.resource.apps import AppsResource
 from aci.resource.functions import FunctionsResource
+from aci.resource.linked_accounts import LinkedAccountsResource
 from aci.types.functions import FunctionDefinitionFormat
 
 logger: logging.Logger = logging.getLogger(__name__)
@@ -72,6 +73,7 @@ class ACI:
         self.apps = AppsResource(self.httpx_client)
         self.functions = FunctionsResource(self.httpx_client)
         self.app_configurations = AppConfigurationsResource(self.httpx_client)
+        self.linked_accounts = LinkedAccountsResource(self.httpx_client)
 
     def __enter__(self) -> ACI:
         self.httpx_client.__enter__()
@@ -79,9 +81,9 @@ class ACI:
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc_val: Optional[BaseException],
-        exc_tb: Optional[TracebackType],
+        exc_type: type[BaseException] | None = None,
+        exc_val: BaseException | None = None,
+        exc_tb: TracebackType | None = None,
     ) -> None:
         self.httpx_client.__exit__(exc_type, exc_val, exc_tb)
 

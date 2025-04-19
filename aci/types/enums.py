@@ -8,8 +8,6 @@ class SecurityScheme(str, Enum):
 
     NO_AUTH = "no_auth"
     API_KEY = "api_key"
-    HTTP_BASIC = "http_basic"
-    HTTP_BEARER = "http_bearer"
     OAUTH2 = "oauth2"
 
 

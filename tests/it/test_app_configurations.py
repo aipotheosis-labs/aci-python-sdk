@@ -8,7 +8,7 @@ from aci.types.enums import SecurityScheme
 ACI_API_KEY = os.getenv("ACI_API_KEY")
 
 """
-The repo doesn't use load_dotenv() so we need to set the environment variables manually.
+The codease doesn't use load_dotenv() so we need to set the environment variables manually.
 You can use something like dotenv to load the environment variables from a .env file for a single run.
 e.g.
 

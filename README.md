@@ -96,6 +96,69 @@ configuration: AppConfiguration = client.app_configurations.get(app_name="GMAIL"
 client.app_configurations.delete(app_name="GMAIL")
 ```
 
+### Linked Accounts
+#### Types
+```python
+from aci.types.linked_accounts import LinkedAccount
+from aci.types.enums import SecurityScheme
+```
+
+#### Methods
+```python
+# Link an account
+# Returns created LinkedAccount for API_KEY and NO_AUTH security schemes
+# Returns authorization URL string for OAUTH2 security scheme (you need to finish the flow in browser to create the account)
+result = client.linked_accounts.link(
+    app_name="BRAVE_SEARCH",                  # Name of the app to link to
+    linked_account_owner_id="user123",        # ID to identify the owner of this linked account
+    security_scheme=SecurityScheme.API_KEY,   # Type of authentication
+    api_key="your-api-key"                    # Required for API_KEY security scheme
+)
+
+# OAuth2 example (returns auth URL for user to complete OAuth flow in browser)
+oauth_url = client.linked_accounts.link(
+    app_name="GMAIL",
+    linked_account_owner_id="user123",
+    security_scheme=SecurityScheme.OAUTH2
+)
+
+# No-auth example
+account = client.linked_accounts.link(
+    app_name="AIPOLABS_SECRETS_MANAGER",
+    linked_account_owner_id="user123",
+    security_scheme=SecurityScheme.NO_AUTH
+)
+```
+
+```python
+# List linked accounts
+# All parameters are optional
+accounts: list[LinkedAccount] = client.linked_accounts.list(
+    app_name="BRAVE_SEARCH",                  # Filter by app name
+    linked_account_owner_id="user123"         # Filter by owner ID
+)
+```
+
+```python
+# Get a specific linked account by ID (note: linked_account_id is different from the linked_account_owner_id)
+account: LinkedAccount = client.linked_accounts.get(linked_account_id=account_id)
+```
+
+```python
+# Enable a linked account (note: linked_account_id is different from the linked_account_owner_id)
+account: LinkedAccount = client.linked_accounts.enable(linked_account_id=account_id)
+```
+
+```python
+# Disable a linked account (note: linked_account_id is different from the linked_account_owner_id)
+account: LinkedAccount = client.linked_accounts.disable(linked_account_id=account_id)
+```
+
+```python
+# Delete a linked account (note: linked_account_id is different from the linked_account_owner_id)
+client.linked_accounts.delete(linked_account_id=account_id)
+```
+
 ### Functions
 #### Types
 ```python

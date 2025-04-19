@@ -33,3 +33,11 @@ uv run pytest tests/it
           }
       }
       ```
+
+### Build and publish the package
+
+```bash
+uv sync
+uv build
+uv publish --token $PYPI_API_TOKEN
+```
