@@ -34,7 +34,7 @@ uv run pytest tests/unit
 
 # run integration tests
 export ACI_API_KEY=<your-api-key>
-export LINKED_ACCOUNT_OWNER_ID=<your-linked-account-owner-id>
+export OPENAI_API_KEY=<your-openai-api-key>
 uv run pytest tests/it
 ```
 

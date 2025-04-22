@@ -11,10 +11,7 @@ from aci._constants import DEFAULT_SERVER_URL
 from aci._exceptions import APIKeyNotFound
 from aci.meta_functions import (
     ACIExecuteFunction,
-    ACIGetFunctionDefinition,
-    ACISearchApps,
     ACISearchFunctions,
-    ACISearchFunctionsWithIntent,
 )
 from aci.resource.app_configurations import AppConfigurationsResource
 from aci.resource.apps import AppsResource
@@ -98,8 +95,7 @@ class ACI:
         """Routes and executes function calls based on the function name.
         This can be a convenience function to handle function calls from LLM without you checking the function name.
 
-        It supports handling built-in meta functions (ACI_SEARCH_APPS, ACI_SEARCH_FUNCTIONS,
-        ACI_GET_FUNCTION_DEFINITION, ACI_EXECUTE_FUNCTION) and also handling executing third-party functions
+        It supports handling built-in meta functions (ACI_SEARCH_FUNCTIONS, ACI_EXECUTE_FUNCTION) and also handling executing third-party functions
         directly like BRAVE_SEARCH__WEB_SEARCH.
 
         Args:
@@ -108,7 +104,7 @@ class ACI:
             linked_account_owner_id: To specify the end-user (account owner) on behalf of whom you want to execute functions
             You need to first link corresponding account with the same owner id in the ACI dashboard (https://platform.aci.dev).
             allowed_apps_only: If true, only returns functions/apps that are allowed to be used by the agent/accessor, identified by the api key.
-            format: Decides the function definition format returned by 'functions.get_definition' and 'functions.search'
+            format: Decides the function definition format returned by ACI_SEARCH_FUNCTIONS (which fundamnetally is 'functions.search')
         Returns:
             Any: The result (serializable) of the function execution. It varies based on the function.
         """
@@ -120,15 +116,7 @@ class ACI:
             f"allowed_apps_only={allowed_apps_only}, "
             f"format={format}"
         )
-        if function_name == ACISearchApps.NAME:
-            apps = self.apps.search(**function_arguments, allowed_apps_only=allowed_apps_only)
-
-            return [app.model_dump(exclude_none=True) for app in apps]
-
-        elif (
-            function_name == ACISearchFunctions.NAME
-            or function_name == ACISearchFunctionsWithIntent.NAME
-        ):
+        if function_name == ACISearchFunctions.get_name():
             functions = self.functions.search(
                 **function_arguments,
                 allowed_apps_only=allowed_apps_only,
@@ -137,10 +125,7 @@ class ACI:
 
             return functions
 
-        elif function_name == ACIGetFunctionDefinition.NAME:
-            return self.functions.get_definition(**function_arguments, format=format)
-
-        elif function_name == ACIExecuteFunction.NAME:
+        elif function_name == ACIExecuteFunction.get_name():
             # TODO: sometimes when using the fixed_tool approach llm most time doesn't put input arguments in the
             # 'function_arguments' key as defined in ACI_EXECUTE_FUNCTION schema,
             # so we need to handle that here. It is a bit hacky, we should improve this in the future
@@ -156,7 +141,7 @@ class ACI:
         else:
             # If the function name is not a meta function, we assume it is a direct function execution of
             # an ACI indexed function
-            # TODO: check function exist if not throw excpetion?
+            # TODO: handle cases where functions are from other sources (from other frameworks or custom functions)?
             result = self.functions.execute(
                 function_name, function_arguments, linked_account_owner_id
             )

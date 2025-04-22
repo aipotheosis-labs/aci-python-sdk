@@ -81,6 +81,7 @@ strict_equality = true
 [dependency-groups]
 dev = [
     "mypy>=1.15.0",
+    "openai>=1.75.0",
     "pre-commit>=4.2.0",
     "pytest>=8.3.5",
     "respx>=0.22.0",

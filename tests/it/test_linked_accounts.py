@@ -40,19 +40,19 @@ def test_linked_accounts() -> None:
         security_scheme=SecurityScheme.API_KEY,
     )
     aci.app_configurations.create(
-        app_name="AIPOLABS_SECRETS_MANAGER",
+        app_name="AGENT_SECRETS_MANAGER",
         security_scheme=SecurityScheme.NO_AUTH,
     )
 
     # step 2: link accounts with different security schemes
     # Link a NO_AUTH account
     no_auth_account = aci.linked_accounts.link(
-        app_name="AIPOLABS_SECRETS_MANAGER",
+        app_name="AGENT_SECRETS_MANAGER",
         linked_account_owner_id=TEST_OWNER_ID,
         security_scheme=SecurityScheme.NO_AUTH,
     )
     no_auth_account = LinkedAccount.model_validate(no_auth_account)
-    assert no_auth_account.app_name == "AIPOLABS_SECRETS_MANAGER"
+    assert no_auth_account.app_name == "AGENT_SECRETS_MANAGER"
     assert no_auth_account.linked_account_owner_id == TEST_OWNER_ID
     assert no_auth_account.security_scheme == SecurityScheme.NO_AUTH
     assert no_auth_account.enabled is True
@@ -80,7 +80,7 @@ def test_linked_accounts() -> None:
     assert len(accounts) == 2
     assert {account.app_name for account in accounts} == {
         "BRAVE_SEARCH",
-        "AIPOLABS_SECRETS_MANAGER",
+        "AGENT_SECRETS_MANAGER",
     }
 
     # step 4: get a specific linked account
@@ -122,7 +122,7 @@ def test_linked_accounts() -> None:
     assert len(accounts) == 0
 
     # step 9: clean up app configurations
-    for app_name in ["BRAVE_SEARCH", "AIPOLABS_SECRETS_MANAGER"]:
+    for app_name in ["BRAVE_SEARCH", "AGENT_SECRETS_MANAGER"]:
         aci.app_configurations.delete(app_name=app_name)
 
     # step 10: verify app configurations are deleted
