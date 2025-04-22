@@ -319,4 +319,4 @@ result = client.handle_function_call(
 )
 ```
 
-Please see [agent examples](https://github.com/aipotheosis-labs/aci-agents) for more advanced and complete examples.
+Please see [agent examples](https://github.com/aipotheosis-labs/aci-agents?tab=readme-ov-file#2-agent-with-dynamic-tool-discovery-and-execution) for more advanced and complete examples.
