@@ -1,7 +1,7 @@
 [project]
 name = "aci-sdk"
-version = "0.0.2b3"
-description = "Add your description here"
+version = "1.0.0b1"
+description = "The Python SDK for the Agent Computer Interface (ACI) by Aipotheosis Labs"
 authors = [{ name = "Aipolabs", email = "support@aipolabs.xyz" }]
 maintainers = [{ name = "Aipolabs", email = "support@aipolabs.xyz" }]
 readme = "README.md"
@@ -81,6 +81,7 @@ strict_equality = true
 [dependency-groups]
 dev = [
     "mypy>=1.15.0",
+    "openai>=1.75.0",
     "pre-commit>=4.2.0",
     "pytest>=8.3.5",
     "respx>=0.22.0",

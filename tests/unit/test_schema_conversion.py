@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict
 from typing_extensions import TypedDict
 
 from aci import to_json_schema
-from aci.types.functions import FunctionDefinitionFormat
+from aci.types.enums import FunctionDefinitionFormat
 
 
 class RequiredDict(TypedDict):

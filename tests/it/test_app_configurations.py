@@ -41,10 +41,10 @@ def test_app_configurations() -> None:
     assert brave_search_configuration.security_scheme == SecurityScheme.API_KEY
 
     asm_configuration = aci.app_configurations.create(
-        app_name="AIPOLABS_SECRETS_MANAGER",
+        app_name="AGENT_SECRETS_MANAGER",
         security_scheme=SecurityScheme.NO_AUTH,
     )
-    assert asm_configuration.app_name == "AIPOLABS_SECRETS_MANAGER"
+    assert asm_configuration.app_name == "AGENT_SECRETS_MANAGER"
     assert asm_configuration.security_scheme == SecurityScheme.NO_AUTH
 
     # step 2: get a specific app configuration
@@ -56,7 +56,7 @@ def test_app_configurations() -> None:
     app_configurations = aci.app_configurations.list()
     assert len(app_configurations) == 3
     assert all(
-        app_configuration.app_name in ["GMAIL", "BRAVE_SEARCH", "AIPOLABS_SECRETS_MANAGER"]
+        app_configuration.app_name in ["GMAIL", "BRAVE_SEARCH", "AGENT_SECRETS_MANAGER"]
         for app_configuration in app_configurations
     )
     assert all(
@@ -79,10 +79,10 @@ def test_app_configurations() -> None:
     assert app_configurations[0].app_name in [
         "GMAIL",
         "BRAVE_SEARCH",
-        "AIPOLABS_SECRETS_MANAGER",
+        "AGENT_SECRETS_MANAGER",
     ]
 
     # step 6: delete all app configurations
-    for app_name in ["GMAIL", "BRAVE_SEARCH", "AIPOLABS_SECRETS_MANAGER"]:
+    for app_name in ["GMAIL", "BRAVE_SEARCH", "AGENT_SECRETS_MANAGER"]:
         aci.app_configurations.delete(app_name=app_name)
     assert len(aci.app_configurations.list()) == 0

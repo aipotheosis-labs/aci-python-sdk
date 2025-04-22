@@ -124,7 +124,7 @@ oauth_url = client.linked_accounts.link(
 
 # No-auth example
 account = client.linked_accounts.link(
-    app_name="AIPOLABS_SECRETS_MANAGER",
+    app_name="AGENT_SECRETS_MANAGER",
     linked_account_owner_id="user123",
     security_scheme=SecurityScheme.NO_AUTH
 )
@@ -162,7 +162,8 @@ client.linked_accounts.delete(linked_account_id=account_id)
 ### Functions
 #### Types
 ```python
-from aci.types.functions import FunctionExecutionResult, FunctionDefinitionFormat
+from aci.types.functions import FunctionExecutionResult
+from aci.types.enums import FunctionDefinitionFormat
 ```
 
 #### Methods
@@ -272,26 +273,43 @@ response = openai.chat.completions.create(
 ```
 
 ### Agent-centric features
+
 The SDK provides a suite of features and helper functions to make it easier and more seamless to use functions in LLM powered agentic applications.
 This is our vision and the recommended way of trying out the SDK.
 
 #### Meta Functions and Unified Function Calling Handler
-We provide 4 meta functions that can be used with LLMs as tools directly, and a unified handler for function calls. With these the LLM can discover apps and functions (that our platform supports) and execute them autonomously.
+
+- A set of meta functions that can be used with LLMs as tools directly. Essentially, they are just the json schema version of some of the backend APIs of ACI.dev. They are provided so that your LLM/Agent can utlize some of the features of ACI.dev directly via function (tool) calling.
+
+- A unified handler for function (tool) calls, which handles both the direct function calls (e.g., BRAVE_SEARCH__WEB_SEARCH) and the meta functions calls (e.g., ACISearchFunctions, ACIExecuteFunction).
 
 ```python
-from aci import meta_functions
+from aci.meta_functions import ACISearchFunctions, ACIExecuteFunction
+from aci.types.enums import FunctionDefinitionFormat
 
 # meta functions
 tools = [
-    meta_functions.ACISearchApps.SCHEMA,
-    meta_functions.ACISearchFunctions.SCHEMA,
-    meta_functions.ACIGetFunctionDefinition.SCHEMA,
-    meta_functions.ACIExecuteFunction.SCHEMA,
+    ACISearchFunctions.to_json_schema(FunctionDefinitionFormat.OPENAI),
+    ACIExecuteFunction.to_json_schema(FunctionDefinitionFormat.OPENAI),
 ]
+
+# use the meta functions (tools) in a openai chat completion api
+response = openai.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {
+            "role": "system",
+            "content": "Can you help star aipotheosis-labs/aci github repo?",
+        },
+    ],
+    tools=tools
+)
 ```
 
 ```python
 # unified function calling handler
+tool_call = response.choices[0].message.tool_calls[0]
+
 result = client.handle_function_call(
     tool_call.function.name,
     json.loads(tool_call.function.arguments),
@@ -301,4 +319,4 @@ result = client.handle_function_call(
 )
 ```
 
-There are mainly two ways to use the platform with the meta functions, please see [agent patterns](https://github.com/aipotheosis-labs/aci-agents?tab=readme-ov-file#2-agent-with-dynamic-tool-discovery-and-execution)
+Please see [agent examples](https://github.com/aipotheosis-labs/aci-agents) for more advanced and complete examples.

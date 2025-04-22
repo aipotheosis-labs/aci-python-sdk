@@ -13,7 +13,7 @@ from aci._exceptions import (
     UnknownError,
     ValidationError,
 )
-from aci.types.functions import FunctionDefinitionFormat
+from aci.types.enums import FunctionDefinitionFormat
 
 from .utils import MOCK_BASE_URL
 

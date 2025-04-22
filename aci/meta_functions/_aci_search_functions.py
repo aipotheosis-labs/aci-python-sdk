@@ -1,51 +1,48 @@
 """
-This module defines the ACI_SEARCH_FUNCTIONS meta function, which is used by LLM to search for
-relevant executable functions that can help complete a task.
+This module defines the ACI_SEARCH_FUNCTIONS meta function, which can be used by LLMs/Agents to search for
+relevant executable functions that can help complete tasks.
 
-You can filter by adding app names, which can be retrieved using the ACI_SEARCH_APPS meta function.
+The ACI_SEARCH_FUNCTIONS is basically the json schema version of the SDK's client.functions.search(...) method,
+but simplified with less parameters to make it more reliable for LLM function calling:
+- It focuses primarily on the 'intent' parameter to find relevant functions
+- It omits 'app_names', 'allowed_apps_only', 'format' parameters to simplify the interface
+- It keeps pagination functionality with 'limit' and 'offset' parameters
+
+Use this meta function when you want an LLM to discover relevant executable functions based on
+the user's intent.
 """
 
-NAME = "ACI_SEARCH_FUNCTIONS"
-SCHEMA = {
-    "type": "function",
-    "function": {
-        "name": NAME,
-        "description": "This function allows you to find relevant executable functions that can help complete "
-        "your tasks or get data and information you need.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "app_names": {
-                    "type": "array",
-                    "items": {"type": "string"},
-                    "description": "The names of the apps you want to search functions for. If provided, the "
-                    "search will be limited to the functions of the specified apps. Use null to "
-                    "search functions across all apps. You can find app names by first using the "
-                    "ACI_SEARCH_APPS function.",
+from aci.meta_functions._base import MetaFunctionBase
+
+
+class ACISearchFunctions(MetaFunctionBase):
+    @classmethod
+    def _get_base_schema(cls) -> dict:
+        return {
+            "name": "ACI_SEARCH_FUNCTIONS",
+            "description": "This function allows you to find relevant executable functions and their schemas that can help complete your tasks.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "intent": {
+                        "type": "string",
+                        "description": "Use this to find relevant functions you might need. Returned results of this "
+                        "function will be sorted by relevance to the intent.",
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "default": 100,
+                        "description": "The maximum number of functions to return from the search per response.",
+                        "minimum": 1,
+                    },
+                    "offset": {
+                        "type": "integer",
+                        "default": 0,
+                        "minimum": 0,
+                        "description": "Pagination offset.",
+                    },
                 },
-                "intent": {
-                    "type": "string",
-                    "description": "Use this to find relevant functions you might need. Returned results of this "
-                    "function will be sorted by relevance to the intent. Examples include 'what's "
-                    "the top news in the stock market today', 'i want to automate outbound "
-                    "marketing emails'.",
-                },
-                "limit": {
-                    "type": "integer",
-                    "default": 100,
-                    "description": "The maximum number of functions to return from the search per response.",
-                    "minimum": 1,
-                    "maximum": 1000,
-                },
-                "offset": {
-                    "type": "integer",
-                    "default": 0,
-                    "minimum": 0,
-                    "description": "Pagination offset.",
-                },
+                "required": [],
+                "additionalProperties": False,
             },
-            "required": [],
-            "additionalProperties": False,
-        },
-    },
-}
+        }
