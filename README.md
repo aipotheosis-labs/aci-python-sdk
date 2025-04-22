@@ -162,7 +162,8 @@ client.linked_accounts.delete(linked_account_id=account_id)
 ### Functions
 #### Types
 ```python
-from aci.types.functions import FunctionExecutionResult, FunctionDefinitionFormat
+from aci.types.functions import FunctionExecutionResult
+from aci.types.enums import FunctionDefinitionFormat
 ```
 
 #### Methods

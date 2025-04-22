@@ -4,8 +4,8 @@ import httpx
 from tenacity import retry
 
 from aci.resource._base import APIResource, retry_config
+from aci.types.enums import FunctionDefinitionFormat
 from aci.types.functions import (
-    FunctionDefinitionFormat,
     FunctionExecutionParams,
     FunctionExecutionResult,
     GetFunctionDefinitionParams,

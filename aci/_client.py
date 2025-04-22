@@ -20,7 +20,7 @@ from aci.resource.app_configurations import AppConfigurationsResource
 from aci.resource.apps import AppsResource
 from aci.resource.functions import FunctionsResource
 from aci.resource.linked_accounts import LinkedAccountsResource
-from aci.types.functions import FunctionDefinitionFormat
+from aci.types.enums import FunctionDefinitionFormat
 
 logger: logging.Logger = logging.getLogger(__name__)
 

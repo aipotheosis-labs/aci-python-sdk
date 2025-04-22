@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Callable, Optional
 
-from aci.types.functions import FunctionDefinitionFormat
+from aci.types.enums import FunctionDefinitionFormat
 
 from ._function_schema import DocstringStyle, function_schema
 
