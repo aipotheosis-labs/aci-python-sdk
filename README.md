@@ -119,7 +119,9 @@ result = client.linked_accounts.link(
 oauth_url = client.linked_accounts.link(
     app_name="GMAIL",
     linked_account_owner_id="user123",
-    security_scheme=SecurityScheme.OAUTH2
+    security_scheme=SecurityScheme.OAUTH2,
+    # Optional parameter to redirect to a custom URL after the OAuth2 flow (default to https://platform.aci.dev)
+    after_oauth2_link_redirect_url="https://<your website for your end users>"
 )
 
 # No-auth example

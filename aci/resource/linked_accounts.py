@@ -84,6 +84,7 @@ class LinkedAccountsResource(APIResource):
         security_scheme: SecurityScheme,
         linked_account_owner_id: str,
         api_key: str | None = None,
+        after_oauth2_link_redirect_url: str | None = DEFAULT_AFTER_OAUTH2_FLOW_REDIRECT_URL,
     ) -> LinkedAccount | str:
         """Link an account with the specified authentication type.
 
@@ -92,6 +93,8 @@ class LinkedAccountsResource(APIResource):
             linked_account_owner_id: ID of the owner of the linked account, e.g., "johndoe"
             security_scheme: The security scheme to use for the linked account.
             api_key: API key for authentication (required when security_scheme is API_KEY).
+            after_oauth2_link_redirect_url (Only applicable when security_scheme is OAUTH2):
+                The URL to redirect to after the OAuth2 link, default to aci.dev's dev portal.
 
         Returns:
             if security_scheme is API_KEY or NO_AUTH, returns the linked account.
@@ -138,8 +141,7 @@ class LinkedAccountsResource(APIResource):
             validated_params = LinkedAccountOAuth2Create(
                 app_name=app_name,
                 linked_account_owner_id=linked_account_owner_id,
-                # TODO: make this customizable for users?
-                after_oauth2_link_redirect_url=DEFAULT_AFTER_OAUTH2_FLOW_REDIRECT_URL,
+                after_oauth2_link_redirect_url=after_oauth2_link_redirect_url,
             ).model_dump(exclude_none=True, mode="json")
 
             logger.info(
