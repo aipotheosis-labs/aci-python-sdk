@@ -58,16 +58,36 @@ def test_list_linked_accounts_success(client: ACI, list_params: Dict) -> None:
 
 
 @respx.mock
-def test_get_linked_account_success(client: ACI) -> None:
+@pytest.mark.parametrize(
+    "security_scheme, mock_credentials",
+    [
+        (
+            SecurityScheme.OAUTH2,
+            {"access_token": "test-oauth2-token"},
+        ),
+        (
+            SecurityScheme.API_KEY,
+            {"secret_key": "test-api-key"},
+        ),
+        (
+            SecurityScheme.NO_AUTH,
+            {},
+        ),
+    ],
+)
+def test_get_linked_account_with_credentials_success(
+    client: ACI, security_scheme: SecurityScheme, mock_credentials: dict
+) -> None:
     mock_response = {
         "id": MOCK_LINKED_ACCOUNT_ID,
         "project_id": MOCK_PROJECT_ID,
         "app_name": MOCK_APP_NAME,
         "linked_account_owner_id": MOCK_OWNER_ID,
-        "security_scheme": SecurityScheme.API_KEY,
+        "security_scheme": security_scheme,
         "enabled": True,
         "created_at": "2023-01-01T00:00:00Z",
         "updated_at": "2023-01-01T00:00:00Z",
+        "security_credentials": mock_credentials,
     }
 
     route = respx.get(f"{MOCK_BASE_URL}linked-accounts/{MOCK_LINKED_ACCOUNT_ID}").mock(
@@ -78,8 +98,9 @@ def test_get_linked_account_success(client: ACI) -> None:
     assert linked_account.id == UUID(MOCK_LINKED_ACCOUNT_ID)
     assert linked_account.app_name == MOCK_APP_NAME
     assert linked_account.linked_account_owner_id == MOCK_OWNER_ID
+    assert linked_account.security_scheme == security_scheme
+    assert linked_account.security_credentials.model_dump() == mock_credentials
     assert route.call_count == 1, "should not retry"
-
 
 @respx.mock
 def test_get_linked_account_not_found(client: ACI) -> None:
@@ -281,6 +302,7 @@ def test_server_error_retry(client: ACI) -> None:
         "app_name": MOCK_APP_NAME,
         "linked_account_owner_id": MOCK_OWNER_ID,
         "security_scheme": SecurityScheme.API_KEY,
+        "security_credentials": {"secret_key": "test-api-key"},
         "enabled": True,
         "created_at": "2023-01-01T00:00:00Z",
         "updated_at": "2023-01-01T00:00:00Z",
@@ -309,6 +331,7 @@ def test_rate_limit_retry(client: ACI) -> None:
         "app_name": MOCK_APP_NAME,
         "linked_account_owner_id": MOCK_OWNER_ID,
         "security_scheme": SecurityScheme.API_KEY,
+        "security_credentials": {"secret_key": "test-api-key"},
         "enabled": True,
         "created_at": "2023-01-01T00:00:00Z",
         "updated_at": "2023-01-01T00:00:00Z",
