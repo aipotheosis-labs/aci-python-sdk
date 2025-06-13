@@ -61,6 +61,11 @@ class LinkedAccountsResource(APIResource):
         """Get a linked account by its ID.
 
         Args:
+            linked_account_id: The ID of the linked account.
+
+        Returns:
+            LinkedAccountWithCredentials: The linked account including limited credentials.
+        """
             linked_account_id: ID of the linked account to get.
             Note: linked_account_id is different from the linked_account_owner_id.
             See https://www.aci.dev/docs/core-concepts/linked-account#what-is-linked-account-owner-id
