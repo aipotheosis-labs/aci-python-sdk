@@ -102,6 +102,7 @@ def test_get_linked_account_with_credentials_success(
     assert linked_account.security_credentials.model_dump() == mock_credentials
     assert route.call_count == 1, "should not retry"
 
+
 @respx.mock
 def test_get_linked_account_not_found(client: ACI) -> None:
     route = respx.get(f"{MOCK_BASE_URL}linked-accounts/{MOCK_LINKED_ACCOUNT_ID}").mock(

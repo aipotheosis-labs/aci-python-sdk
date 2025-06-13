@@ -54,6 +54,7 @@ class APIKeySchemeCredentialsLimited(BaseModel):
 
     secret_key: str
 
+
 class LinkedAccount(BaseModel):
     """Public representation of a linked account."""
 
@@ -68,10 +69,12 @@ class LinkedAccount(BaseModel):
 
     model_config = ConfigDict(from_attributes=True, extra="allow")
 
+
 class LinkedAccountWithCredentials(LinkedAccount):
     security_credentials: (
         OAuth2SchemeCredentialsLimited | APIKeySchemeCredentialsLimited | NoAuthSchemeCredentials
     )
+
 
 class LinkedAccountsList(BaseModel):
     """Parameters for listing linked accounts."""
