@@ -37,7 +37,7 @@ class LinkedAccountUpdate(BaseModel):
     enabled: bool | None = None
 
 
-class NoAuthSchemeCredentials(BaseModel):
+class NoAuthSchemeCredentialsLimited(BaseModel):
     """Limited no-auth credentials containing only access token"""
 
     pass
@@ -72,7 +72,9 @@ class LinkedAccount(BaseModel):
 
 class LinkedAccountWithCredentials(LinkedAccount):
     security_credentials: (
-        OAuth2SchemeCredentialsLimited | APIKeySchemeCredentialsLimited | NoAuthSchemeCredentials
+        OAuth2SchemeCredentialsLimited
+        | APIKeySchemeCredentialsLimited
+        | NoAuthSchemeCredentialsLimited
     )
 
 
