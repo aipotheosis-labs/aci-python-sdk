@@ -37,6 +37,23 @@ class LinkedAccountUpdate(BaseModel):
     enabled: bool | None = None
 
 
+class NoAuthSchemeCredentials(BaseModel):
+    """Limited no-auth credentials containing only access token"""
+
+    pass
+
+
+class OAuth2SchemeCredentialsLimited(BaseModel):
+    """Limited OAuth2 credentials containing only access token"""
+
+    access_token: str
+
+
+class APIKeySchemeCredentialsLimited(BaseModel):
+    """Limited API key credentials containing only secret key"""
+
+    secret_key: str
+
 class LinkedAccount(BaseModel):
     """Public representation of a linked account."""
 
@@ -51,6 +68,10 @@ class LinkedAccount(BaseModel):
 
     model_config = ConfigDict(from_attributes=True, extra="allow")
 
+class LinkedAccountWithCredentials(LinkedAccount):
+    security_credentials: (
+        OAuth2SchemeCredentialsLimited | APIKeySchemeCredentialsLimited | NoAuthSchemeCredentials
+    )
 
 class LinkedAccountsList(BaseModel):
     """Parameters for listing linked accounts."""
