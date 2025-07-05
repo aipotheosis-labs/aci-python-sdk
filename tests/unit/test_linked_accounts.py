@@ -63,15 +63,19 @@ def test_list_linked_accounts_success(client: ACI, list_params: Dict) -> None:
     [
         (
             SecurityScheme.OAUTH2,
-            {"access_token": "test-oauth2-token"},
+            {
+                "access_token": "test-oauth2-token",
+                "expires_at": 1714857600,
+                "refresh_token": "test-refresh-token",
+            },
         ),
         (
             SecurityScheme.API_KEY,
-            {"secret_key": "test-api-key"},
+            None,
         ),
         (
             SecurityScheme.NO_AUTH,
-            {},
+            None,
         ),
     ],
 )
@@ -99,7 +103,10 @@ def test_get_linked_account_with_credentials_success(
     assert linked_account.app_name == MOCK_APP_NAME
     assert linked_account.linked_account_owner_id == MOCK_OWNER_ID
     assert linked_account.security_scheme == security_scheme
-    assert linked_account.security_credentials.model_dump() == mock_credentials
+    if security_scheme == SecurityScheme.OAUTH2:
+        assert linked_account.security_credentials.model_dump() == mock_credentials
+    else:
+        assert linked_account.security_credentials is None
     assert route.call_count == 1, "should not retry"
 
 
@@ -303,7 +310,7 @@ def test_server_error_retry(client: ACI) -> None:
         "app_name": MOCK_APP_NAME,
         "linked_account_owner_id": MOCK_OWNER_ID,
         "security_scheme": SecurityScheme.API_KEY,
-        "security_credentials": {"secret_key": "test-api-key"},
+        "security_credentials": {},
         "enabled": True,
         "created_at": "2023-01-01T00:00:00Z",
         "updated_at": "2023-01-01T00:00:00Z",
@@ -332,7 +339,7 @@ def test_rate_limit_retry(client: ACI) -> None:
         "app_name": MOCK_APP_NAME,
         "linked_account_owner_id": MOCK_OWNER_ID,
         "security_scheme": SecurityScheme.API_KEY,
-        "security_credentials": {"secret_key": "test-api-key"},
+        "security_credentials": {},
         "enabled": True,
         "created_at": "2023-01-01T00:00:00Z",
         "updated_at": "2023-01-01T00:00:00Z",

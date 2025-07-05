@@ -66,7 +66,7 @@ class LinkedAccountsResource(APIResource):
             See https://www.aci.dev/docs/core-concepts/linked-account#what-is-linked-account-owner-id
 
         Returns:
-            LinkedAccountWithCredentials: The linked account including limited credentials.
+            LinkedAccountWithCredentials: The linked account including credentials if it is oauth2 account.
 
         Raises:
             Various exceptions defined in _handle_response for different HTTP status codes.
