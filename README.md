@@ -99,7 +99,7 @@ client.app_configurations.delete(app_name="GMAIL")
 ### Linked Accounts
 #### Types
 ```python
-from aci.types.linked_accounts import LinkedAccount
+from aci.types.linked_accounts import LinkedAccount, LinkedAccountWithCredentials
 from aci.types.enums import SecurityScheme
 ```
 
@@ -136,7 +136,7 @@ account = client.linked_accounts.link(
 ```python
 # List linked accounts
 # All parameters are optional
-accounts: list[LinkedAccount] = client.linked_accounts.list(
+accounts = client.linked_accounts.list(
     app_name="BRAVE_SEARCH",                  # Filter by app name
     linked_account_owner_id="user123"         # Filter by owner ID
 )
@@ -144,17 +144,17 @@ accounts: list[LinkedAccount] = client.linked_accounts.list(
 
 ```python
 # Get a specific linked account by ID (note: linked_account_id is different from the linked_account_owner_id)
-account: LinkedAccount = client.linked_accounts.get(linked_account_id=account_id)
+account = client.linked_accounts.get(linked_account_id=account_id)
 ```
 
 ```python
 # Enable a linked account (note: linked_account_id is different from the linked_account_owner_id)
-account: LinkedAccount = client.linked_accounts.enable(linked_account_id=account_id)
+account = client.linked_accounts.enable(linked_account_id=account_id)
 ```
 
 ```python
 # Disable a linked account (note: linked_account_id is different from the linked_account_owner_id)
-account: LinkedAccount = client.linked_accounts.disable(linked_account_id=account_id)
+account = client.linked_accounts.disable(linked_account_id=account_id)
 ```
 
 ```python
