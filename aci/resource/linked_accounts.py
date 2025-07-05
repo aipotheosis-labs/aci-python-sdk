@@ -15,6 +15,7 @@ from aci.types.linked_accounts import (
     LinkedAccountOAuth2Create,
     LinkedAccountsList,
     LinkedAccountUpdate,
+    LinkedAccountWithCredentials,
 )
 
 logger: logging.Logger = logging.getLogger(__name__)
@@ -56,7 +57,7 @@ class LinkedAccountsResource(APIResource):
         return linked_accounts
 
     @retry(**retry_config)  # type: ignore
-    def get(self, linked_account_id: UUID) -> LinkedAccount:
+    def get(self, linked_account_id: UUID) -> LinkedAccountWithCredentials:
         """Get a linked account by its ID.
 
         Args:
@@ -65,7 +66,7 @@ class LinkedAccountsResource(APIResource):
             See https://www.aci.dev/docs/core-concepts/linked-account#what-is-linked-account-owner-id
 
         Returns:
-            LinkedAccount: The linked account.
+            LinkedAccountWithCredentials: The linked account including limited credentials.
 
         Raises:
             Various exceptions defined in _handle_response for different HTTP status codes.
@@ -73,7 +74,7 @@ class LinkedAccountsResource(APIResource):
         logger.info(f"Getting linked account with linked_account_id: {linked_account_id}")
         response = self._httpx_client.get(f"linked-accounts/{linked_account_id}")
         data: dict = self._handle_response(response)
-        linked_account = LinkedAccount.model_validate(data)
+        linked_account = LinkedAccountWithCredentials.model_validate(data)
 
         return linked_account
 

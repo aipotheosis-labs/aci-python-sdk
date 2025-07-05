@@ -26,6 +26,7 @@ class AppConfigurationsResource(APIResource):
     ) -> List[AppConfiguration]:
         """List app configurations.
 
+
         Args:
             app_names: Filter by app names.
             limit: Maximum number of results per response.
