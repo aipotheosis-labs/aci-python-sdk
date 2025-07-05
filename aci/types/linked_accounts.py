@@ -1,7 +1,7 @@
 from datetime import datetime
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
 
 from aci.types.enums import SecurityScheme
 
@@ -37,22 +37,12 @@ class LinkedAccountUpdate(BaseModel):
     enabled: bool | None = None
 
 
-class NoAuthSchemeCredentialsLimited(BaseModel):
-    """Limited no-auth credentials containing only access token"""
-
-    pass
-
-
 class OAuth2SchemeCredentialsLimited(BaseModel):
     """Limited OAuth2 credentials containing only access token"""
 
     access_token: str
-
-
-class APIKeySchemeCredentialsLimited(BaseModel):
-    """Limited API key credentials containing only secret key"""
-
-    secret_key: str
+    expires_at: int | None = None  # access token expiration time, seconds since epoch
+    refresh_token: str | None = None  # refresh token, if present
 
 
 class LinkedAccount(BaseModel):
@@ -71,11 +61,16 @@ class LinkedAccount(BaseModel):
 
 
 class LinkedAccountWithCredentials(LinkedAccount):
-    security_credentials: (
-        OAuth2SchemeCredentialsLimited
-        | APIKeySchemeCredentialsLimited
-        | NoAuthSchemeCredentialsLimited
-    )
+    """Linked account with credentials (only OAuth2 is supported for now)"""
+
+    security_credentials: OAuth2SchemeCredentialsLimited | None = None
+
+    # if security_credentials is empty dict (which is the case for API key and no-auth accounts), set it to None
+    @field_validator("security_credentials", mode="before")
+    def validate_security_credentials(cls, v: dict) -> dict | None:
+        if not v:
+            return None
+        return v
 
 
 class LinkedAccountsList(BaseModel):

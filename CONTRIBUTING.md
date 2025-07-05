@@ -33,6 +33,7 @@ pip install uv
 uv run pytest tests/unit
 
 # run integration tests
+# make sure the aci account you use has no app configurations nor linked accounts
 export ACI_API_KEY=<your-api-key>
 export OPENAI_API_KEY=<your-openai-api-key>
 uv run pytest tests/it
