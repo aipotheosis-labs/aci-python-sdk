@@ -39,7 +39,6 @@ dependencies = [
     "griffe>=1.7.2",
     "httpx>=0.27.2",
     "pydantic>=2.11.3",
-    "socksio>=1.0.0",
     "tenacity>=8.2.3",
     "typing-extensions>=4.13.2",
 ]
