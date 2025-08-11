@@ -50,7 +50,7 @@ class SearchFunctionsParams(BaseModel):
 
     app_names: list[str] | None = None
     intent: str | None = None
-    allowed_apps_only: bool = False
+    allowed_only: bool = False
     format: FunctionDefinitionFormat = FunctionDefinitionFormat.OPENAI
     limit: int | None = None
     offset: int | None = None

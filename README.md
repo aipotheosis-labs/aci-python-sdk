@@ -176,7 +176,7 @@ from aci.types.enums import FunctionDefinitionFormat
 functions: list[dict] = client.functions.search(
     app_names=["BRAVE_SEARCH", "TAVILY"],
     intent="I want to search the web",
-    allowed_apps_only=False, # If true, only returns functions of apps that are allowed by the agent/accessor, identified by the api key.
+    allowed_only=False, # If true, only returns enabled functions of apps that are allowed by the agent/accessor, identified by the api key.
     format=FunctionDefinitionFormat.OPENAI, # The format of the functions, can be OPENAI, ANTHROPIC, BASIC (name and description only)
     limit=10,
     offset=0
@@ -317,7 +317,7 @@ result = client.handle_function_call(
     tool_call.function.name,
     json.loads(tool_call.function.arguments),
     linked_account_owner_id="john_doe",
-    allowed_apps_only=True,
+    allowed_only=True,
     format=FunctionDefinitionFormat.OPENAI
 )
 ```

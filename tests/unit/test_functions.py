@@ -30,7 +30,7 @@ MOCK_FUNCTION_ARGUMENTS = {"param1": "value1", "param2": "value2"}
         {
             "app_names": ["TEST"],
             "intent": "test",
-            "allowed_apps_only": True,
+            "allowed_only": True,
             "format": FunctionDefinitionFormat.OPENAI,
             "limit": 10,
             "offset": 0,
