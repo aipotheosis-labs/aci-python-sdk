@@ -5,7 +5,7 @@ relevant executable functions that can help complete tasks.
 The ACI_SEARCH_FUNCTIONS is basically the json schema version of the SDK's client.functions.search(...) method,
 but simplified with less parameters to make it more reliable for LLM function calling:
 - It focuses primarily on the 'intent' parameter to find relevant functions
-- It omits 'app_names', 'allowed_apps_only', 'format' parameters to simplify the interface
+- It omits 'app_names', 'allowed_only', 'format' parameters to simplify the interface
 - It keeps pagination functionality with 'limit' and 'offset' parameters
 
 Use this meta function when you want an LLM to discover relevant executable functions based on
