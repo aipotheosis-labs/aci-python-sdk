@@ -49,6 +49,13 @@ class FunctionsResource(APIResource):
         Raises:
             Various exceptions defined in _handle_response for different HTTP status codes.
         """
+
+        # TODO: remove this after allowed_apps_only is removed
+        if allowed_apps_only and not allowed_only:
+            logger.warning(
+                "'allowed_apps_only' is deprecated and will be removed in a future version; use 'allowed_only' instead."
+            )
+
         validated_params = SearchFunctionsParams(
             app_names=app_names,
             intent=intent,
