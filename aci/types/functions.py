@@ -1,6 +1,6 @@
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from aci.types.enums import FunctionDefinitionFormat
 
@@ -50,7 +50,12 @@ class SearchFunctionsParams(BaseModel):
 
     app_names: list[str] | None = None
     intent: str | None = None
-    allowed_apps_only: bool = False
+    allowed_apps_only: bool = Field(
+        default=False,
+        description="Deprecated, use `allowed_only` instead. If true, only returns enabled functions of apps that are allowed by the agent/accessor, identified by the api key.",
+        deprecated=True,
+    )
+    allowed_only: bool = False
     format: FunctionDefinitionFormat = FunctionDefinitionFormat.OPENAI
     limit: int | None = None
     offset: int | None = None

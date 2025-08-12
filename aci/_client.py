@@ -90,6 +90,7 @@ class ACI:
         function_arguments: dict,
         linked_account_owner_id: str,
         allowed_apps_only: bool = False,
+        allowed_only: bool = False,
         format: FunctionDefinitionFormat = FunctionDefinitionFormat.OPENAI,
     ) -> Any:
         """Routes and executes function calls based on the function name.
@@ -103,7 +104,8 @@ class ACI:
             function_arguments: Dictionary containing the input arguments for the function.
             linked_account_owner_id: To specify the end-user (account owner) on behalf of whom you want to execute functions
             You need to first link corresponding account with the same owner id in the ACI dashboard (https://platform.aci.dev).
-            allowed_apps_only: If true, only returns functions/apps that are allowed to be used by the agent/accessor, identified by the api key.
+            allowed_apps_only: Deprecated, use `allowed_only` instead. If true, only returns enabled functions of apps that are allowed to be used by the agent/accessor, identified by the api key.
+            allowed_only: If true, only returns enabled functions of apps that are allowed to be used by the agent/accessor, identified by the api key.
             format: Decides the function definition format returned by ACI_SEARCH_FUNCTIONS (which fundamnetally is 'functions.search')
         Returns:
             Any: The result (serializable) of the function execution. It varies based on the function.
@@ -114,12 +116,13 @@ class ACI:
             f"params={function_arguments}, "
             f"linked_account_owner_id={linked_account_owner_id}, "
             f"allowed_apps_only={allowed_apps_only}, "
+            f"allowed_only={allowed_only}, "
             f"format={format}"
         )
         if function_name == ACISearchFunctions.get_name():
             functions = self.functions.search(
                 **function_arguments,
-                allowed_apps_only=allowed_apps_only,
+                allowed_only=allowed_only or allowed_apps_only,
                 format=format,
             )
 
