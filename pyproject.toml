@@ -1,6 +1,6 @@
 [project]
 name = "aci-sdk"
-version = "1.0.0b3"
+version = "1.0.0b4"
 description = "The Python SDK for the Agent Computer Interface (ACI) by Aipotheosis Labs"
 authors = [{ name = "Aipolabs", email = "support@aipolabs.xyz" }]
 maintainers = [{ name = "Aipolabs", email = "support@aipolabs.xyz" }]
