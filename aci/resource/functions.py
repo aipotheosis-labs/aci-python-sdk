@@ -25,6 +25,7 @@ class FunctionsResource(APIResource):
         app_names: list[str] | None = None,
         intent: str | None = None,
         allowed_apps_only: bool = False,
+        allowed_only: bool = False,
         format: FunctionDefinitionFormat = FunctionDefinitionFormat.OPENAI,
         limit: int | None = None,
         offset: int | None = None,
@@ -35,7 +36,9 @@ class FunctionsResource(APIResource):
         Args:
             app_names: List of app names to filter functions by.
             intent: search results will be sorted by relevance to this intent.
-            allowed_apps_only: If true, only returns functions of apps that are allowed by the
+            allowed_apps_only: Deprecated, use `allowed_only` instead. If true, only returns enabled functions of apps that are allowed by the
+                agent/accessor, identified by the api key.
+            allowed_only: If true, only returns enabled functions of apps that are allowed by the
                 agent/accessor, identified by the api key.
             limit: for pagination, maximum number of functions to return.
             offset: for pagination, number of functions to skip before returning results.
@@ -46,10 +49,17 @@ class FunctionsResource(APIResource):
         Raises:
             Various exceptions defined in _handle_response for different HTTP status codes.
         """
+
+        # TODO: remove this after allowed_apps_only is removed
+        if allowed_apps_only and not allowed_only:
+            logger.warning(
+                "'allowed_apps_only' is deprecated and will be removed in a future version; use 'allowed_only' instead."
+            )
+
         validated_params = SearchFunctionsParams(
             app_names=app_names,
             intent=intent,
-            allowed_apps_only=allowed_apps_only,
+            allowed_only=allowed_only or allowed_apps_only,
             format=format,
             limit=limit,
             offset=offset,
